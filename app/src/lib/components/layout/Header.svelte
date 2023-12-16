@@ -5,8 +5,8 @@
 
 	import Basket from '~icons/ph/shopping-cart';
 	import { sidebar_cart_open } from '$lib/components/cart';
-	import type { Cart } from '@medusajs/medusa';
-	import type { Customer } from 'sveltekit-medusa-client';
+	import type { Cart, Customer } from '@medusajs/medusa';
+
 	export let cart: Cart | undefined = undefined;
 	export let user: Customer | undefined = undefined;
 

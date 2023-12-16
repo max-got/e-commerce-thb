@@ -15,7 +15,7 @@
 <Sidebar />
 <div class="mx-auto flex h-full flex-col">
 	<TopHeader />
-	<Header user={data.user} cart={data.cart} />
+	<Header user={data.user ?? undefined} cart={data.cart} />
 	<slot />
 	<Footer />
 </div>
