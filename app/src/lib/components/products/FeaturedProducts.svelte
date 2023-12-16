@@ -1,0 +1,115 @@
+<script lang="ts">
+	import type { PricedProduct } from '@medusajs/types/';
+	export let featured_products: PricedProduct[] = [];
+
+	import ArrowRight from '~icons/ph/arrow-right';
+</script>
+
+<section class="relative py-6">
+	<div
+		class="max-w-screen bg-accent relative z-0 mx-auto overflow-hidden rounded-3xl px-4 py-8 text-white [background-image:radial-gradient(circle,_color-mix(in_srgb,theme(colors.accent.DEFAULT),theme(colors.secondary.DEFAULT)_40%)_1px,_rgba(0,_0,_0,_0)_1px)] [background-size:40px_40px] sm:px-6 sm:py-12 lg:px-8"
+	>
+		<div
+			class="absolute inset-0 -z-10 [background:linear-gradient(to_bottom,_theme(colors.accent.DEFAULT/60%),_rgba(255,_255,_255,_0))]"
+		></div>
+
+		<header class="text-center">
+			<h2 class="text-xl font-bold sm:text-3xl">Entdecke unsere Produkte</h2>
+
+			<p class="mx-auto mt-4 max-w-md text-white">
+				Richte deinen Blick auf die Zukunft. Mit unseren Produkten bist du für jedes Wetter gewappnet.
+			</p>
+		</header>
+
+		<ul class="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-3">
+			{#each featured_products as featured_product}
+				<li
+					class="overflow-hidden rounded-lg last-of-type:lg:col-span-2 last-of-type:lg:col-start-2 last-of-type:lg:row-span-2 last-of-type:lg:row-start-1"
+				>
+					<a href="/s/p/{featured_product.handle}" class="group relative block overflow-hidden">
+						<img
+							src={featured_product.thumbnail}
+							alt=""
+							class="aspect-square w-full object-cover transition duration-500 group-hover:opacity-70"
+						/>
+						<div
+							class="to-accent/40 absolute inset-0 bg-gradient-to-b from-transparent to-95% opacity-0 transition-opacity group-hover:opacity-100"
+						></div>
+
+						<div
+							class="border-accent-300 absolute bottom-0 left-0 right-0 z-20 flex translate-y-8 flex-col items-start justify-end rounded-t-[24px] bg-white/40 px-6 py-2 shadow-[0px_-4px_16px_rgba(17,17,26,0.1),_0px_8px_24px_rgba(17,17,26,0.1),_0px_16px_56px_rgba(17,17,26,0.1)] transition-all group-hover:translate-y-0 group-hover:bg-white/90 group-hover:shadow-lg"
+						>
+							<h3 class="text-accent text-xl font-extrabold">{featured_product.title}</h3>
+
+							<span
+								class="bg-accent mt-1.5 flex items-center justify-center gap-2 rounded-lg px-2 py-1 text-xs font-medium uppercase tracking-wide text-white"
+							>
+								Shop Now
+								<ArrowRight />
+							</span>
+						</div>
+					</a>
+				</li>
+			{/each}
+			<!-- <li>
+				<a href="/" class=" group relative block">
+					<img
+						src="https://images.unsplash.com/photo-1618898909019-010e4e234c55?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80"
+						alt=""
+						class="aspect-square w-full rounded-lg object-cover transition duration-500 group-hover:opacity-90"
+					/>
+
+					<div class="absolute inset-0 flex flex-col items-start justify-end p-6">
+						<h3 class="text-xl font-medium text-white">Casual Trainers</h3>
+
+						<span
+							class="mt-1.5 inline-block bg-black px-5 py-3 text-xs font-medium uppercase tracking-wide text-white"
+						>
+							Shop Now
+						</span>
+					</div>
+				</a>
+			</li>
+
+			<li>
+				<a href="/" class="group relative block">
+					<img
+						src="https://images.unsplash.com/photo-1624623278313-a930126a11c3?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80"
+						alt=""
+						class="aspect-square h-full w-full rounded-lg object-cover transition duration-500 group-hover:opacity-90"
+					/>
+
+					<div class="absolute inset-0 flex flex-col items-start justify-end p-6">
+						<h3 class="text-xl font-medium text-white">Winter Jumpers</h3>
+
+						<span
+							class="mt-1.5 inline-block bg-black px-5 py-3 text-xs font-medium uppercase tracking-wide text-white"
+						>
+							Shop Now
+						</span>
+					</div>
+				</a>
+			</li>
+
+			<li class="lg:col-span-2 lg:col-start-2 lg:row-span-2 lg:row-start-1">
+				<a href="/" class="group relative block h-full">
+					<img
+						src="https://images.unsplash.com/photo-1593795899768-947c4929449d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2672&q=80"
+						alt=""
+						class="aspect-square h-full w-full rounded-lg object-cover transition duration-500 group-hover:opacity-90"
+					/>
+
+					<div class="absolute inset-0 flex flex-col items-start justify-end p-6">
+						<h3 class="text-xl font-medium text-white">Skinny Jeans Blue</h3>
+
+						<span
+							class="mt-1.5 inline-block bg-black px-5 py-3 text-xs font-medium uppercase tracking-wide text-white"
+						>
+							Shop Now
+						</span>
+					</div>
+				</a>
+			</li> -->
+		</ul>
+	</div>
+</section>

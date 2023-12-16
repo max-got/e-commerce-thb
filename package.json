@@ -1,0 +1,20 @@
+{
+  "name": "e-commerce_thb_23",
+  "version": "1.0.0",
+  "description": "Projekt für das Modul \"E-Commerce\" im Wintersemester 23/24 an der THB ",
+  "scripts": {
+    "dev:app": "cd app && npm run dev",
+    "dev:medusa": "cd medusa && npm run dev",
+    "dev": "concurrently -n \"app|medusa\" --name-separator \"|\" -c \"#ff3e00,#9cdcfe\"  \"npm run dev:app\" \"npm run dev:medusa\""
+  },
+  "keywords": [],
+  "author": "Max Gottschalk",
+  "license": "ISC",
+  "workspaces": [
+    "app/*",
+    "medusa/*"
+  ],
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

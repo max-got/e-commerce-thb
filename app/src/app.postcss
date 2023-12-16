@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		@apply font-display font-[900];
+		text-wrap: balance;
+	}
+
+	h1 {
+		@apply text-4xl tracking-tighter;
+	}
+
+	h2 {
+		@apply text-3xl tracking-tight;
+	}
+
+	h3 {
+		@apply text-2xl tracking-tight;
+	}
+
+	h4 {
+		@apply text-xl tracking-tight;
+	}
+
+	h5 {
+		@apply text-lg tracking-tight;
+	}
+
+	a {
+		@apply text-primary underline hover:text-primary-400;
+	}
+
+	p {
+		text-wrap: balance;
+	}
+	p,
+	label {
+		@apply font-body leading-relaxed tracking-tighter text-gray-700;
+	}
+
+	label {
+		@apply underline underline-offset-4;
+	}
+
+	input[type='text'],
+	input[type='email'],
+	select {
+		@apply block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300  placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6;
+	}
+
+	input:-webkit-autofill,
+	input:-webkit-autofill:focus {
+		transition:
+			background-color 0s 600000s,
+			color 0s 600000s;
+	}
+}
+
+@layer utilities {
+	.noise {
+		background-image: url('/assets/noise.png');
+		background-repeat: repeat;
+		background-blend-mode: multiply;
+	}
+}
