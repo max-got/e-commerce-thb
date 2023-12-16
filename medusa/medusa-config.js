@@ -22,26 +22,17 @@ try {
 } catch (e) {}
 
 // // CORS when consuming Medusa from admin
-const ADMIN_CORS =
-	process.env.ADMIN_CORS || 'http://localhost:7000,http://localhost:7001';
+const ADMIN_CORS = process.env.ADMIN_CORS || 'http://localhost:7000,http://localhost:7001';
 
 // // CORS to avoid issues when consuming Medusa from a client
 const STORE_CORS = process.env.STORE_CORS || 'http://localhost:8000';
 
-// const DATABASE_URL =
-// 	process.env.DATABASE_URL || 'postgres://localhost/medusa-starter-default';
-
-// const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
+const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 
 const plugins = [
 	`medusa-fulfillment-manual`,
 	`medusa-payment-manual`,
-	// {
-	// 	resolve: `@medusajs/file-local`,
-	// 	options: {
-	// 		upload_dir: 'uploads',
-	// 	},
-	// },
+
 	{
 		resolve: '@medusajs/admin',
 		/** @type {import('@medusajs/admin').PluginOptions} */
@@ -63,18 +54,18 @@ const plugins = [
 ];
 
 const modules = {
-	/*eventBus: {
-    resolve: "@medusajs/event-bus-redis",
-    options: {
-      redisUrl: REDIS_URL
-    }
-  },
-  cacheService: {
-    resolve: "@medusajs/cache-redis",
-    options: {
-      redisUrl: REDIS_URL
-    }
-  },*/
+	eventBus: {
+		resolve: '@medusajs/event-bus-redis',
+		options: {
+			redisUrl: REDIS_URL,
+		},
+	},
+	cacheService: {
+		resolve: '@medusajs/cache-redis',
+		options: {
+			redisUrl: REDIS_URL,
+		},
+	},
 };
 
 /** @type {import('@medusajs/medusa').ConfigModule["projectConfig"]} */
@@ -85,7 +76,7 @@ const projectConfig = {
 	database_url: process.env.SUPABASE_DATABASE_URL,
 	admin_cors: ADMIN_CORS,
 	// Uncomment the following lines to enable REDIS
-	// redis_url: REDIS_URL
+	redis_url: REDIS_URL,
 };
 
 /** @type {import('@medusajs/medusa').ConfigModule} */
