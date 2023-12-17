@@ -27,7 +27,7 @@
 			<div class="flex-1 md:flex md:items-center md:gap-12">
 				<a class="block" href="/">
 					<span class="sr-only">Home</span>
-					<Logo class="group-hover:text-primary text-primary h-fit w-16 transition-colors" />
+					<Logo class="group-hover:text-primary text-primary h-full w-16 transition-colors" />
 				</a>
 			</div>
 
