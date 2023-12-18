@@ -29,8 +29,8 @@
 			Nicht öffentliche Seite
 		</h2>
 		<p>
-			Diese Seite ist ein Projekt des Moduls "E-Commerce" im Masterstudiengang Wirtschaftsinformatik an
-			der <a href="https://www.th-brandenburg.de">Technischen Hochschule Brandenburg</a>.
+			Diese Seite ist ein Projekt des Moduls "E-Commerce" im Masterstudiengang Wirtschaftsinformatik
+			an der <a href="https://www.th-brandenburg.de">Technischen Hochschule Brandenburg</a>.
 		</p>
 	</div>
 
@@ -40,7 +40,9 @@
 				<input id="userName" name="username" autocomplete="username" value="" class="!hidden" />
 
 				<div>
-					<label for="name" class="block text-sm font-medium leading-6 text-gray-900">Dein Name</label>
+					<label for="name" class="block text-sm font-medium leading-6 text-gray-900"
+						>Dein Name</label
+					>
 
 					<input
 						id="name"
@@ -53,7 +55,8 @@
 					/>
 				</div>
 				<div>
-					<label for="password" class="block text-sm font-medium leading-6 text-gray-900">Passwort</label
+					<label for="password" class="block text-sm font-medium leading-6 text-gray-900"
+						>Passwort</label
 					>
 
 					<input
@@ -87,9 +90,4 @@
 			<a href="https://github.com/max-got" target="_blank"> folgen Sie mir auf GitHub </a>
 		</p>
 	</div>
-</div>
-
-<div class="m-auto flex w-fit gap-4 px-4 py-2">
-	<a href="/imprint">Impressum</a>
-	<a href="/privacy-policy">Datenschutzerklärung</a>
 </div>

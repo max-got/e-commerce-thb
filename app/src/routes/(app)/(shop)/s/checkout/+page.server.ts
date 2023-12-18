@@ -109,7 +109,7 @@ export const actions: Actions = {
 		return message(form, 'Shipping option added');
 	},
 
-	guest_checkout: async ({ request, locals, fetch }) => {
+	guest_checkout: async ({ request, locals }) => {
 		const form = await superValidate(request, guest_checkout);
 		try {
 			if (!form.valid) {
@@ -120,7 +120,7 @@ export const actions: Actions = {
 				return message(form, 'Warenkorb konnte nicht gefunden werden.', { status: 404 });
 			}
 
-			const cart = await medusa_client.carts.update(locals.cartid, {
+			await medusa_client.carts.update(locals.cartid, {
 				email: form.data.email,
 				country_code: form.data.country_code,
 				shipping_address: {
@@ -134,18 +134,8 @@ export const actions: Actions = {
 				}
 			});
 
-			const { shipping_options } = await fetch('/s/checkout/shipping-option', {
-				method: 'POST',
-				body: JSON.stringify({ option_id: cart.cart.id })
-			}).then((res) => res.json());
-
-			if (shipping_options.length === 0) {
-				return message(form, 'Keine Versandoptionen gefunden', { status: 500 });
-			}
-
 			return message(form, {
-				success: true,
-				shipping_options
+				success: true
 			});
 		} catch (error) {
 			//!TODO: handle error
