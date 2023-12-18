@@ -22,9 +22,9 @@
 					<Logo class="text-primary group-hover:text-accent-100 h-fit w-24 transition-colors" />
 				</a>
 				<p class="text-accent-100 my-4 max-w-prose text-sm font-light">
-					Mehr als nur Schirme, sondern Ausdruck deines einzigartigen Styles. Unsere Teile trotzen nicht
-					nur dem Regen, sondern auch dem Gewöhnlichen. Urbaner Chic, made in Germany. Hier regiert Zenit
-					- wo Streetwear auf Funktion trifft und dein Style keine Kompromisse kennt.
+					Mehr als nur Schirme, sondern Ausdruck deines einzigartigen Styles. Unsere Teile trotzen
+					nicht nur dem Regen, sondern auch dem Gewöhnlichen. Urbaner Chic, made in Germany. Hier
+					regiert Zenit - wo Streetwear auf Funktion trifft und dein Style keine Kompromisse kennt.
 				</p>
 				<!-- NEWSLETTER  -->
 				<div class="flex flex-col py-4">
@@ -33,9 +33,11 @@
 						Erhalte Produktneuheiten und Updates in deinem Posteingang
 					</p>
 					<form action="#">
-						<div class="mx-auto mb-3 max-w-screen-sm items-center space-y-4 sm:flex sm:space-y-0">
+						<div class=" mb-3 max-w-screen-sm items-center space-y-4 sm:flex sm:space-y-0">
 							<div class="relative w-full">
-								<label for="email" class="mb-2 hidden text-sm font-medium text-gray-900 dark:text-gray-300"
+								<label
+									for="email"
+									class="mb-2 hidden text-sm font-medium text-gray-900 dark:text-gray-300"
 									>Email address</label
 								>
 								<div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -58,14 +60,23 @@
 								>
 							</div>
 						</div>
-						<div
-							class="newsletter-form-footer mx-auto max-w-screen-sm text-left text-sm text-gray-500 dark:text-gray-300"
-						>
-							We care about the protection of your data. <a
-								href="#"
-								class="text-primary-600 dark:text-primary-500 font-medium hover:underline"
-								>Read our Privacy Policy</a
-							>.
+
+						<div class="flex items-center">
+							<input
+								id="terms"
+								name="terms"
+								type="checkbox"
+								required
+								class="h-4 w-4 rounded border-gray-300"
+							/>
+							<label for="terms" class="ml-2 block max-w-prose text-sm text-white no-underline">
+								Ich bestätige, dass ich die <a
+									href="/terms-and-conditions"
+									class="text-secondary hover:text-secondary-600">Geschäftsbedingungen</a
+								>
+								von Zenit gelesen und verstanden habe und stimme der Verarbeitung meiner persönlichen
+								Daten für Marketing- und Profilingzwecke zu.
+							</label>
 						</div>
 					</form>
 				</div>
@@ -74,31 +85,18 @@
 			<div class="mt-7 max-w-[700px] grow justify-end lg:flex lg:flex-row">
 				<!-- FOOTER LINKS -->
 				<div class="flex w-full flex-row flex-wrap lg:flex-nowrap lg:items-start lg:justify-end">
-					<!-- LINK BLOCK -->
-					<div class="my-5 mr-8 flex flex-1 flex-col space-y-5 lg:ml-10">
-						<h2 class="text-accent-200 text-base uppercase">SOLUTION</h2>
-						<a href="" class="font-body text-sm font-light text-white">Marketing</a>
-						<a href="" class="font-body text-sm font-light text-white">Analytics</a>
-						<a href="" class="font-body text-sm font-light text-white">Commerce</a>
-						<a href="" class="font-body text-sm font-light text-white">Insights</a>
-					</div>
-					<!-- LINK BLOCK -->
-					<div class="my-5 mr-8 flex flex-1 flex-col space-y-5 lg:ml-10">
-						<h2 class="text-accent-200 text-base uppercase">SUPPORT</h2>
-						<a href="" class="font-body text-sm font-light text-white">Pricing</a>
-						<a href="" class="font-body text-sm font-light text-white">Documentation</a>
-						<a href="" class="font-body text-sm font-light text-white">Guides</a>
-						<a href="" class="font-body text-sm font-light text-white">API Status</a>
-					</div>
-					<!-- LINK BLOCK -->
 					<div class="my-5 mr-8 flex flex-1 flex-col space-y-5 lg:ml-10">
 						<h2 class="text-accent-200 text-base uppercase">Support</h2>
-						<a href="/hilfe/agb" class="font-body text-sm font-light text-white">AGBs</a>
-						<a href="/hilfe/ruecksendung-rueckerstattung" class="font-body text-sm font-light text-white"
+						<a href="/help/return-refund" class="font-body text-sm font-light text-white"
 							>Rückgabe</a
 						>
-						<a href="/hilfe/zahlungsoptionen" class="font-body text-sm font-light text-white"
+						<a href="/help/payment-options" class="font-body text-sm font-light text-white"
 							>Zahlungsoptionen</a
+						>
+						<a href="/terms-and-conditions" class="font-body text-sm font-light text-white">AGBs</a>
+						<a href="/imprint" class="font-body text-sm font-light text-white">Impressum</a>
+						<a href="/privacy-policy" class="font-body text-sm font-light text-white"
+							>Datenschutzerklärung</a
 						>
 					</div>
 				</div>
@@ -123,7 +121,9 @@
 			{#if $page.data.user}
 				<LogOutLink colorway="ghost" class="lg:ml-auto" />
 			{/if}
-			<p class="font-inter text-sm text-gray-500 lg:mt-0">© Copyright 2023. All rights reserved.</p>
+			<p class="font-inter text-sm text-gray-500 lg:mt-0">
+				© Copyright 2023. All rights reserved.
+			</p>
 		</div>
 		<div class="cloud1 absolute inset-0 will-change-transform">
 			<enhanced:img
