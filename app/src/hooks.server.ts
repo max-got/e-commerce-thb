@@ -42,18 +42,18 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const is_thb_student = event.cookies.get('is_thb_student');
 
 	if (is_thb_student) {
-		const parsed = JSON.parse(is_thb_student) as { has_access: boolean; name: string };
-		if (parsed.name) {
+		const { name } = JSON.parse(is_thb_student) as { has_access: boolean; name: string };
+		if (name) {
 			event.locals.student = {
-				name: parsed.name || ''
+				name: name || ''
 			};
 		}
 	}
 
-	if (
-		!PUBLIC_ROUTES.includes(event.url.pathname) &&
-		!event.url.pathname?.startsWith('/maintenance')
-	) {
+	const is_maintenance_page = event.url.pathname?.startsWith('/maintenance');
+	const is_public_route = PUBLIC_ROUTES.includes(event.url.pathname);
+
+	if (!is_maintenance_page && !is_public_route) {
 		if (!(await medusa_health_check())) {
 			redirect(REDIRECT_TEMPORARY, '/maintenance');
 		}
@@ -64,6 +64,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 		event = await handle_medusa_request(event);
 		return await resolve(event);
+	}
+
+	// If the event's URL pathname starts with '/maintenance' and the Medusa health check passes
+	if (is_maintenance_page && (await medusa_health_check())) {
+		// Redirect to the home page
+		redirect(REDIRECT_TEMPORARY, '/');
 	}
 
 	const response = await resolve(event);
