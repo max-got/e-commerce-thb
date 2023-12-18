@@ -10,13 +10,13 @@
 	<div class="max-w-layout relative z-10 mx-auto flex items-center justify-end gap-4 px-4 py-1">
 		<div class="flex items-center gap-2 sm:flex">
 			<a
-				class="hover:bg-accent-100 hover:text-accent after:bg-accent-300 relative rounded-sm px-2 py-px text-xs text-white no-underline after:absolute after:-right-1 after:bottom-1 after:top-1 after:block after:w-px last-of-type:after:content-none"
+				class="hover:bg-accent-100 hover:text-accent after:bg-accent-300 relative hidden rounded-sm px-2 py-px text-xs text-white no-underline after:absolute after:-right-1 after:bottom-1 after:top-1 after:block after:w-px last-of-type:after:content-none md:block"
 				href="/s/search"
 			>
 				Suche
 			</a>
 			<a
-				class="hover:bg-accent-100 hover:text-accent after:bg-accent-300 relative rounded-sm px-2 py-px text-xs text-white no-underline after:absolute after:-right-1 after:bottom-1 after:top-1 after:block after:w-px last-of-type:after:content-none"
+				class="hover:bg-accent-100 hover:text-accent after:bg-accent-300 relative hidden rounded-sm px-2 py-px text-xs text-white no-underline after:absolute after:-right-1 after:bottom-1 after:top-1 after:block after:w-px last-of-type:after:content-none md:block"
 				href="/#faq"
 			>
 				Fragen und Antworten
