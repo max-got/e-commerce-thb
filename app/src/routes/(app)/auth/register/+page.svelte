@@ -5,6 +5,7 @@
 
 	import { register_post_request } from '../_validators';
 	import { COMPANY_INFOS } from '$lib/const';
+	import Button from '$lib/components/primitives/Button.svelte';
 
 	export let data: PageData;
 
@@ -18,9 +19,9 @@
 	$form.rurl = data.rurl || '';
 </script>
 
-<h3 class="font-heading mb-4 text-center text-3xl font-semibold text-gray-900">Login</h3>
-<p class="mb-10 text-lg text-gray-500">
-	Wenn du bereits ein Konto hast, kannst du dich hier anmelden.
+<h3 class="text-primary mb-4 text-center text-3xl">Registrieren</h3>
+<p class="mb-10 text-center text-lg">
+	Hier kannst du dich registrieren, um alle Funktionen von {COMPANY_INFOS.name} nutzen zu können.
 </p>
 
 <form action="?/register" class="mt-8 grid grid-cols-6 gap-6" method="POST" use:enhance>
@@ -123,34 +124,12 @@
 		</p>
 	</div>
 
-	<div class="col-span-6 sm:flex sm:items-center sm:gap-4">
-		<button
-			class="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500"
-		>
-			Login
-		</button>
+	<div class="col-span-6 flex flex-col gap-2 self-end text-right">
+		<Button colorway="accent">Registrieren</Button>
 
 		<p class="mt-4 text-sm text-gray-500 sm:mt-0">
-			Du hast noch kein Konto?
-			<a href="/auth/register" class="text-gray-700 underline">Registrieren</a>.
+			Du hast bereits ein Konto?
+			<a href="/auth/login" class="text-gray-700 underline">Login</a>.
 		</p>
 	</div>
 </form>
-
-<style lang="postcss">
-	.label {
-		@apply mb-4 block text-gray-600;
-	}
-	.label-text {
-		@apply mb-2 ml-1 text-sm font-semibold;
-	}
-	.input {
-		@apply block w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:border-gray-500 focus:outline-none focus:ring-gray-500;
-	}
-	.invalid {
-		@apply my-2 block text-sm text-red-600;
-	}
-	.button {
-		@apply my-4 inline-block w-full rounded-md bg-lime-600 px-5 py-3 text-sm font-semibold text-white transition duration-200 hover:bg-lime-700;
-	}
-</style>
