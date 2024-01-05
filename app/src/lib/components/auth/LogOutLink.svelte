@@ -12,7 +12,6 @@
 
 	const logout: SubmitFunction = async () => {
 		loading.set(true);
-
 		return async ({ result, update }) => {
 			if (result.type === 'success') {
 				toast.success('Erfolgreich ausgeloggt', {
@@ -30,9 +29,7 @@
 			}
 
 			// `update` is a function which triggers the default logic that would be triggered if this callback wasn't set
-			update().then(() => {
-				loading.set(false);
-			});
+			update();
 		};
 	};
 </script>
