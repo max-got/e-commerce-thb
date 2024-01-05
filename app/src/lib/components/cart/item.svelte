@@ -76,7 +76,7 @@
 			class="cb from-accent via-accent-300/60 to-accent col-span-3 block h-px w-full bg-gradient-to-r"
 		></div>
 		<img src={item.thumbnail} alt="" class="h-16 w-16 rounded object-cover [grid-area:image]" />
-		<div class="self-start [grid-area:title;]">
+		<div class="xs:ml-0 ml-auto self-start [grid-area:title;]">
 			<h3 class="text-base font-bold leading-none">{item.title}</h3>
 			{#if item.variant.product.subtitle}
 				<p class="text-secondary-200 text-[10px]">
@@ -84,71 +84,63 @@
 				</p>
 			{/if}
 			<div class="col-start-1 col-end-1 row-start-1 row-end-1">
-				<dl class="text-secondary-200 mt-0.5 space-y-px text-[10px]">
-					<div>
-						<dt class="inline">Size:</dt>
-						<dd class="inline">XXS</dd>
-					</div>
-
-					<div>
-						<dt class="inline">Color:</dt>
-						<dd class="inline">White</dd>
-					</div>
-				</dl>
+				<p class="text-sm">
+					{item.variant.title}
+				</p>
 			</div>
 		</div>
 
-		<form
-			method="POST"
-			class="ml-auto w-fit self-start [grid-area:quantityForm;]"
-			action="/s/cart?/update"
-			use:enhance={update_item}
-			bind:this={form}
-		>
-			<label for="quantity" class="sr-only">Anzahl</label>
-
-			<select
-				name="quantity"
-				id="quantity"
-				class="focus:ring-primary-400 focus:ring-offset-primary-400 {$style !== 'checkout'
-					? 'bg-accent text-white'
-					: 'text-accent bg-white'} w-auto rounded-md px-5 py-1 text-sm bg-blend-luminosity focus:outline-none focus:ring-1 focus:ring-offset-1"
-				on:change={() => form.requestSubmit()}
-				disabled={$loading ? true : undefined}
+		{#if $style !== 'checkout'}
+			<form
+				method="POST"
+				class="ml-auto w-fit self-start [grid-area:quantityForm;]"
+				action="/s/cart?/update"
+				use:enhance={update_item}
+				bind:this={form}
 			>
-				{#each [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as number}
-					<option value={number} selected={item.quantity === number}>{number}</option>
-				{/each}
-			</select>
+				<label for="quantity" class="sr-only">Anzahl</label>
 
-			<input type="hidden" name="item_id" value={item.id} />
-			<input type="hidden" name="quantity" bind:value={item.quantity} />
-		</form>
+				<select
+					name="quantity"
+					id="quantity"
+					class="focus:ring-primary-400 focus:ring-offset-primary-400 w-auto rounded-md px-5 py-1 text-sm bg-blend-luminosity focus:outline-none focus:ring-1 focus:ring-offset-1"
+					on:change={() => form.requestSubmit()}
+					disabled={$loading ? true : undefined}
+				>
+					{#each [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as number}
+						<option value={number} selected={item.quantity === number}>{number}</option>
+					{/each}
+				</select>
+
+				<input type="hidden" name="item_id" value={item.id} />
+				<input type="hidden" name="quantity" bind:value={item.quantity} />
+			</form>
+		{/if}
 		{#if item.total}
-			<p class="font-display text-right text-xs [grid-area:price;]">
+			<p class="flex gap-2 text-right text-xs [grid-area:price;]">
+				<span>Preis:</span>
 				{format_price(item.total)}
 			</p>
 		{/if}
 
-		<p class="text-xs [grid-area:quantity;]">
-			Anzahl: {item.quantity}
+		<p class="flex gap-2 text-xs [grid-area:quantity;]">
+			<span>Anzahl:</span>
+			{item.quantity}
 		</p>
-		<form
-			class="[grid-area:delete;]"
-			method="POST"
-			action="/s/cart?/remove"
-			use:enhance={remove_item}
-		>
-			<Button
-				class="px-1 py-1"
-				colorway={$style !== 'checkout' ? 'simple' : 'white'}
-				size="xsmall"
-				icon={TrashCan}
-				type="submit">Entfernen</Button
+		{#if $style !== 'checkout'}
+			<form
+				class="justify-self-end [grid-area:delete;]"
+				method="POST"
+				action="/s/cart?/remove"
+				use:enhance={remove_item}
 			>
+				<Button class="px-1 py-1" colorway={'accent'} size="xsmall" icon={TrashCan} type="submit"
+					>Entfernen</Button
+				>
 
-			<input type="hidden" name="item_id" value={item.id} />
-		</form>
+				<input type="hidden" name="item_id" value={item.id} />
+			</form>
+		{/if}
 	</li>
 {/key}
 
@@ -159,6 +151,18 @@
 			'image title quantityForm'
 			'delete quantity price';
 		grid-template-columns: 1fr 2fr 1fr;
+
 		align-items: center;
+	}
+
+	@media (max-width: 475px) {
+		li {
+			grid-template-areas:
+				'image title'
+				'quantity quantityForm'
+				'price delete';
+			grid-template-columns: 1fr 2fr;
+			grid-template-rows: auto auto auto auto auto;
+		}
 	}
 </style>
