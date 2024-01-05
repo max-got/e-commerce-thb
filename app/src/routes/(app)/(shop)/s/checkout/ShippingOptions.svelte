@@ -50,41 +50,41 @@
 	on:change={() => form_ref.requestSubmit()}
 >
 	<ul class="grid gap-6">
-		{#each shipping_options as option}
+		{#each shipping_options as shipping}
 			<li class="elevation-2">
 				<input
 					type="radio"
-					id={option.id}
+					id={shipping.id}
 					name="shipping_option"
 					bind:group={$form.shipping_option}
-					value={option.id}
+					value={shipping.id}
 					class="peer hidden"
 					required
 				/>
 				<label
-					for={option.id}
+					for={shipping.id}
 					class="
 					peer-checked:border-primary
 					peer-checked:bg-accent-50/40
 					group inline-flex w-full cursor-pointer items-center justify-between rounded-lg border p-5 no-underline after:!content-none"
 				>
 					<div class="flex w-full flex-col">
-						{#if option.name && option.amount !== undefined && option.amount !== null}
+						{#if shipping.name && shipping.amount !== undefined && shipping.amount !== null}
 							<div class="mb-2 flex justify-between">
 								<p class="font-display name w-full text-sm group-checked:!font-bold">
-									{option.name}
+									{shipping.name}
 								</p>
 								<p class="font-display name text w-full text-end peer-checked:!font-bold">
-									{format_price(option.amount)}
+									{format_price(shipping.amount + shipping.tax_amount)}
 								</p>
 							</div>
 						{/if}
-						{#if option.metadata?.description}
-							<p class="w-full text-xs">{option.metadata.description}</p>
+						{#if shipping.metadata?.description}
+							<p class="w-full text-xs">{shipping.metadata.description}</p>
 						{/if}
-						{#if option.metadata?.delivery_time}
+						{#if shipping.metadata?.delivery_time}
 							<p class="mt-2 w-full text-xs">
-								Lieferzeit: {cast_string(option.metadata.delivery_time).replace('_', ' bis ')} Tag(e)
+								Lieferzeit: {cast_string(shipping.metadata.delivery_time).replace('_', ' bis ')} Tag(e)
 							</p>
 						{/if}
 					</div>

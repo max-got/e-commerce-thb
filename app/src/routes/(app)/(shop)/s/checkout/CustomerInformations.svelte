@@ -3,7 +3,7 @@
 	import type { Address } from '@medusajs/medusa';
 	import Button from '$lib/components/primitives/Button.svelte';
 
-	export let shipping_address: Address;
+	export let address: Address;
 	export let email: string;
 
 	const edit = createEventDispatcher();
@@ -18,12 +18,12 @@
 			on:click={() => edit('edit')}>Bearbeiten</Button
 		>
 	</div>
-	<p>{shipping_address.first_name} {shipping_address.last_name}</p>
-	<p>{shipping_address.address_1}</p>
-	<p>{shipping_address.city}, {shipping_address.postal_code}</p>
-	<p>{shipping_address.country_code?.toUpperCase() ?? ''}</p>
+	<p>{address.first_name} {address.last_name}</p>
+	<p>{address.address_1}</p>
+	<p>{address.city}, {address.postal_code}</p>
+	<p>{address.country_code?.toUpperCase() ?? ''}</p>
 	<p>{email}</p>
-	{#if shipping_address.phone}
-		<p>{shipping_address.phone}</p>
+	{#if address.phone}
+		<p>{address.phone}</p>
 	{/if}
 </div>
