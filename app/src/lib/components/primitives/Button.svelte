@@ -78,7 +78,7 @@
 	{/if}
 	<slot />
 	{#if $$restProps['aria-busy']}
-		<LoadingSpinner class="absolute -right-8 col-start-1 col-end-2" />
+		<LoadingSpinner class="col-start-2 col-end-3" />
 	{/if}
 	{#if icon && icon_position === 'right' && !$$restProps['aria-busy']}
 		<svelte:component this={icon} />
