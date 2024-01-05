@@ -9,6 +9,9 @@ export default {
 				display: ['Inter Variable', ...theme.fontFamily.sans],
 				body: ['IBM Plex Mono', ...theme.fontFamily.mono]
 			},
+			screens: {
+				xs: '475px'
+			},
 			colors: {
 				primary: {
 					DEFAULT: '#CC1132',
