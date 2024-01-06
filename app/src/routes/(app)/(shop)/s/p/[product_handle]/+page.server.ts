@@ -1,22 +1,36 @@
-import { MEDUSA_REGION_ID, MEDUSA_SALES_CHANNELS_IDS } from '$env/static/private';
-import { medusa_sveltekit_client } from '$lib/server/medusa';
+import { MEDUSA_REGION_ID } from '$env/static/private';
+import { medusa_client } from '$lib/server/medusa';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
-export const load = (async ({ params, locals, cookies }) => {
+export const load = (async ({ params }) => {
 	const { product_handle } = params;
 
 	const get_the_product = async ({ handle }: { handle: string }) => {
 		try {
-			const product = await medusa_sveltekit_client.getProduct(
-				`${handle}&region_id=${MEDUSA_REGION_ID}&sales_channel_id[0]=${MEDUSA_SALES_CHANNELS_IDS}`
-			);
+			const product = await medusa_client.products.list({
+				handle: handle,
+				region_id: MEDUSA_REGION_ID
+			});
 
-			if (!product) {
-				throw new Error('Not found');
-			}
+			return product.products[0];
+		} catch (e) {
+			//!TODO handle error
+			error(404, {
+				message: 'Not found'
+			});
+		}
+	};
 
-			return product;
+	const get_other_products = async ({ handle }: { handle: string }) => {
+		try {
+			const products = await medusa_client.products.list({
+				limit: 4
+			});
+
+			products.products = products.products.filter((p) => p.handle !== handle);
+
+			return products.products;
 		} catch (e) {
 			//!TODO handle error
 			error(404, {
@@ -26,6 +40,7 @@ export const load = (async ({ params, locals, cookies }) => {
 	};
 
 	return {
+		other_products: get_other_products({ handle: product_handle }),
 		product: await get_the_product({ handle: product_handle })
 	};
 }) satisfies PageServerLoad;
