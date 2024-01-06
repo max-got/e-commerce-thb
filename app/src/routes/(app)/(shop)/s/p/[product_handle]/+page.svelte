@@ -5,14 +5,46 @@
 	import Gallery from './Gallery.svelte';
 	import { toast } from 'svelte-sonner';
 	import { onMount } from 'svelte';
+	import { queryParam, queryParameters } from 'sveltekit-search-params';
 	import { goto } from '$app/navigation';
 	import { loading } from '$lib/stores/loading';
 	import Button from '$lib/components/primitives/Button.svelte';
 	import { format_price } from '$lib/utils/shop';
+	import { derived, writable } from 'svelte/store';
+	import { inventory_status_store } from './utils';
+
+	import Accordion from './_components/Accordion.svelte';
+	import Details from './_components/utils/Details.svelte';
 
 	export let data: PageData;
 
-	//create a promise
+	let product_title_ref: HTMLHeadingElement;
+
+	const query_parameters = queryParameters<{ variant: string | null }>();
+
+	const variant_query_param = queryParam('variant', {
+		encode: (value: string) => value,
+		decode: (value: string | null) => (value ? value.toString() : null),
+		defaultValue: data.product.variants[0].title?.toLowerCase() || ''
+	});
+
+	const selected_variant_id = writable<string>(data.product.variants[0].id || '');
+	const selected_variant = derived(selected_variant_id, ($selected_variant_id) => {
+		return (
+			data.product.variants.find((variant) => variant.id === $selected_variant_id) ||
+			data.product.variants[0]
+		);
+	});
+
+	selected_variant.subscribe(($selected_variant) => {
+		if ($selected_variant) {
+			variant_query_param.set($selected_variant.title?.toLowerCase() || '');
+		}
+	});
+
+	let inventory_status = derived(selected_variant, ($selected_variant) =>
+		inventory_status_store($selected_variant)
+	);
 
 	const add_to_cart: SubmitFunction = async () => {
 		$loading = true;
@@ -78,396 +110,178 @@
 		};
 	};
 
-	onMount(() => {});
+	$: price = $selected_variant?.original_price_incl_tax
+		? format_price($selected_variant?.original_price_incl_tax)
+		: '';
+
+	onMount(() => {
+		if ($query_parameters.variant) {
+			selected_variant_id.set(
+				data.product.variants.find(
+					(variant) => variant.title?.toLowerCase() === $query_parameters.variant
+				)?.id ||
+					data.product.variants[0].id ||
+					''
+			);
+		}
+	});
 </script>
 
-<div class="bg-white">
-	<div class="pt-6">
-		<!-- Image gallery -->
+<section>
+	<div class="max-w-layout mx-auto">
 		{#if data.product.images}
 			<Gallery images={data.product.images} />
 		{/if}
 
-		<!-- Product info -->
 		<div
-			class="mx-auto max-w-2xl px-4 pb-16 pt-10 sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:grid-rows-[auto,auto,1fr] lg:gap-x-8 lg:px-8 lg:pb-24 lg:pt-16"
+			class="mx-auto px-4 pb-16 pt-4 sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:grid-rows-[auto,auto,1fr] lg:gap-x-8 lg:px-8 lg:pb-24 lg:pt-8"
 		>
 			<div class="lg:col-span-2 lg:border-r lg:border-gray-200 lg:pr-8">
-				<h1 class="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
-					{data.product.title}
-				</h1>
-			</div>
-
-			<!-- Options -->
-			<div class="mt-4 lg:row-span-3 lg:mt-0">
-				<h2 class="sr-only">Product information</h2>
-				<p class="text-3xl tracking-tight text-gray-900">
-					{format_price(data.product.variants[0].calculated_price_incl_tax)}
-				</p>
-
-				<!-- Reviews -->
-				<div class="mt-6">
-					<h3 class="sr-only">Reviews</h3>
-					<div class="flex items-center">
-						<div class="flex items-center">
-							<!-- Active: "text-gray-900", Default: "text-gray-200" -->
-							<svg
-								class="h-5 w-5 flex-shrink-0 text-gray-900"
-								viewBox="0 0 20 20"
-								fill="currentColor"
-								aria-hidden="true"
+				<div class="flex flex-col">
+					<div
+						class="xs:justify-between xs:flex-row flex w-full items-center gap-2 py-3 [@media(min-width:330px)]:flex-col [@media(min-width:370px)]:flex-row"
+					>
+						<h1 class="flex flex-col text-3xl font-extrabold" bind:this={product_title_ref}>
+							{data.product.title}
+							<span
+								class="text-secondary-600 text-center text-sm font-light tracking-normal md:text-start"
 							>
-								<path
-									fill-rule="evenodd"
-									d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"
-									clip-rule="evenodd"
-								/>
-							</svg>
-							<svg
-								class="h-5 w-5 flex-shrink-0 text-gray-900"
-								viewBox="0 0 20 20"
-								fill="currentColor"
-								aria-hidden="true"
-							>
-								<path
-									fill-rule="evenodd"
-									d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"
-									clip-rule="evenodd"
-								/>
-							</svg>
-							<svg
-								class="h-5 w-5 flex-shrink-0 text-gray-900"
-								viewBox="0 0 20 20"
-								fill="currentColor"
-								aria-hidden="true"
-							>
-								<path
-									fill-rule="evenodd"
-									d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"
-									clip-rule="evenodd"
-								/>
-							</svg>
-							<svg
-								class="h-5 w-5 flex-shrink-0 text-gray-900"
-								viewBox="0 0 20 20"
-								fill="currentColor"
-								aria-hidden="true"
-							>
-								<path
-									fill-rule="evenodd"
-									d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"
-									clip-rule="evenodd"
-								/>
-							</svg>
-							<svg
-								class="h-5 w-5 flex-shrink-0 text-gray-200"
-								viewBox="0 0 20 20"
-								fill="currentColor"
-								aria-hidden="true"
-							>
-								<path
-									fill-rule="evenodd"
-									d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"
-									clip-rule="evenodd"
-								/>
-							</svg>
+								{$selected_variant?.title}
+							</span>
+						</h1>
+						<span class="bg-accent mx-4 h-px flex-1"></span>
+						<div class="flex flex-col items-center">
+							<p class="font-display text-accent text-2xl font-extrabold tabular-nums">
+								{price}
+							</p>
+							<span class="text-accent-400 text-sm font-light tracking-normal">inkl. MwSt.</span>
 						</div>
-						<p class="sr-only">4 out of 5 stars</p>
-						<a href="#" class="ml-3 text-sm font-medium text-indigo-600 hover:text-indigo-500"
-							>117 reviews</a
-						>
+						<p class="{$inventory_status.class_name()} hidden text-center">
+							{$inventory_status.text()}
+						</p>
 					</div>
 				</div>
+			</div>
 
-				<form class="mt-10" method="POST" action="/s/cart?/add" use:enhance={add_to_cart}>
-					<input type="hidden" name="variantId" value={data.product.variants[0].id} />
-					<!-- Colors -->
+			<div class="relative lg:row-span-3 lg:mt-0">
+				<form class="sticky top-0" method="POST" action="/s/cart?/add" use:enhance={add_to_cart}>
+					<input type="hidden" name="variantId" value={$selected_variant_id} />
+
 					<div>
-						<h3 class="text-sm font-medium text-gray-900">Color</h3>
-
-						<fieldset class="mt-4">
-							<legend class="sr-only">Choose a color</legend>
-							<div class="flex items-center space-x-3">
-								<!--
-                  Active and Checked: "ring ring-offset-1"
-                  Not Active and Checked: "ring-2"
-                -->
-								<label
-									class="relative -m-0.5 flex cursor-pointer items-center justify-center rounded-full p-0.5 ring-gray-400 focus:outline-none"
-								>
+						<ul class="grid grid-flow-col-dense place-items-center justify-center gap-2">
+							{#each data.product.variants as variant (variant.id)}
+								<li>
 									<input
 										type="radio"
-										name="color-choice"
-										value="White"
-										class="sr-only"
-										aria-labelledby="color-choice-0-label"
+										id="product_variant_{variant.id}"
+										name="product_variant"
+										value={variant.id}
+										bind:group={$selected_variant_id}
+										checked={$selected_variant_id === variant.id}
+										class="peer hidden"
+										required
 									/>
-									<span id="color-choice-0-label" class="sr-only">White</span>
-									<span
-										aria-hidden="true"
-										class="h-8 w-8 rounded-full border border-black border-opacity-10 bg-white"
-									></span>
-								</label>
-								<!--
-                  Active and Checked: "ring ring-offset-1"
-                  Not Active and Checked: "ring-2"
-                -->
-								<label
-									class="relative -m-0.5 flex cursor-pointer items-center justify-center rounded-full p-0.5 ring-gray-400 focus:outline-none"
-								>
-									<input
-										type="radio"
-										name="color-choice"
-										value="Gray"
-										class="sr-only"
-										aria-labelledby="color-choice-1-label"
-									/>
-									<span id="color-choice-1-label" class="sr-only">Gray</span>
-									<span
-										aria-hidden="true"
-										class="h-8 w-8 rounded-full border border-black border-opacity-10 bg-gray-200"
-									></span>
-								</label>
-								<!--
-                  Active and Checked: "ring ring-offset-1"
-                  Not Active and Checked: "ring-2"
-                -->
-								<label
-									class="relative -m-0.5 flex cursor-pointer items-center justify-center rounded-full p-0.5 ring-gray-900 focus:outline-none"
-								>
-									<input
-										type="radio"
-										name="color-choice"
-										value="Black"
-										class="sr-only"
-										aria-labelledby="color-choice-2-label"
-									/>
-									<span id="color-choice-2-label" class="sr-only">Black</span>
-									<span
-										aria-hidden="true"
-										class="h-8 w-8 rounded-full border border-black border-opacity-10 bg-gray-900"
-									></span>
-								</label>
-							</div>
-						</fieldset>
+									<label
+										for="product_variant_{variant.id}"
+										class="peer-checked:after:border-primary opacity-85 relative grid w-full cursor-pointer place-content-center peer-checked:opacity-100 peer-checked:after:absolute peer-checked:after:inset-0 peer-checked:after:block peer-checked:after:border-2"
+									>
+										<img src={variant.thumbnail} class="size-full aspect-1 object-cover" alt="" />
+									</label>
+								</li>
+							{/each}
+						</ul>
 					</div>
 
-					<!-- Sizes -->
-					<div class="mt-10">
-						<div class="flex items-center justify-between">
-							<h3 class="text-sm font-medium text-gray-900">Size</h3>
-							<a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">Size guide</a>
+					<div class="mt-4 flex flex-col gap-4">
+						<div class="flex items-center justify-between gap-2">
+							<h3 class="mb-1 text-base font-normal">
+								Variante: <span class="font-semibold">{$selected_variant.title}</span>
+							</h3>
+							<h3 class="mb-1 text-base font-normal">
+								Preis: <span class="font-semibold"
+									>{$selected_variant?.original_price_incl_tax
+										? format_price($selected_variant?.original_price_incl_tax)
+										: ''}</span
+								>
+							</h3>
 						</div>
 
-						<fieldset class="mt-4">
-							<legend class="sr-only">Choose a size</legend>
-							<div class="grid grid-cols-4 gap-4 sm:grid-cols-8 lg:grid-cols-4">
-								<!-- Active: "ring-2 ring-indigo-500" -->
-								<label
-									class="group relative flex cursor-not-allowed items-center justify-center rounded-md border bg-gray-50 px-4 py-3 text-sm font-medium uppercase text-gray-200 hover:bg-gray-50 focus:outline-none sm:flex-1 sm:py-6"
-								>
-									<input
-										type="radio"
-										name="size-choice"
-										value="XXS"
-										disabled
-										class="sr-only"
-										aria-labelledby="size-choice-0-label"
-									/>
-									<span id="size-choice-0-label">XXS</span>
-									<span
-										aria-hidden="true"
-										class="pointer-events-none absolute -inset-px rounded-md border-2 border-gray-200"
-									>
-										<svg
-											class="absolute inset-0 h-full w-full stroke-2 text-gray-200"
-											viewBox="0 0 100 100"
-											preserveAspectRatio="none"
-											stroke="currentColor"
-										>
-											<line x1="0" y1="100" x2="100" y2="0" vector-effect="non-scaling-stroke" />
-										</svg>
-									</span>
-								</label>
-								<!-- Active: "ring-2 ring-indigo-500" -->
-								<label
-									class="group relative flex cursor-pointer items-center justify-center rounded-md border bg-white px-4 py-3 text-sm font-medium uppercase text-gray-900 shadow-sm hover:bg-gray-50 focus:outline-none sm:flex-1 sm:py-6"
-								>
-									<input
-										type="radio"
-										name="size-choice"
-										value="XS"
-										class="sr-only"
-										aria-labelledby="size-choice-1-label"
-									/>
-									<span id="size-choice-1-label">XS</span>
-									<!--
-                    Active: "border", Not Active: "border-2"
-                    Checked: "border-indigo-500", Not Checked: "border-transparent"
-                  -->
-									<span class="pointer-events-none absolute -inset-px rounded-md" aria-hidden="true"></span>
-								</label>
-								<!-- Active: "ring-2 ring-indigo-500" -->
-								<label
-									class="group relative flex cursor-pointer items-center justify-center rounded-md border bg-white px-4 py-3 text-sm font-medium uppercase text-gray-900 shadow-sm hover:bg-gray-50 focus:outline-none sm:flex-1 sm:py-6"
-								>
-									<input
-										type="radio"
-										name="size-choice"
-										value="S"
-										class="sr-only"
-										aria-labelledby="size-choice-2-label"
-									/>
-									<span id="size-choice-2-label">S</span>
-									<!--
-                    Active: "border", Not Active: "border-2"
-                    Checked: "border-indigo-500", Not Checked: "border-transparent"
-                  -->
-									<span class="pointer-events-none absolute -inset-px rounded-md" aria-hidden="true"></span>
-								</label>
-								<!-- Active: "ring-2 ring-indigo-500" -->
-								<label
-									class="group relative flex cursor-pointer items-center justify-center rounded-md border bg-white px-4 py-3 text-sm font-medium uppercase text-gray-900 shadow-sm hover:bg-gray-50 focus:outline-none sm:flex-1 sm:py-6"
-								>
-									<input
-										type="radio"
-										name="size-choice"
-										value="M"
-										class="sr-only"
-										aria-labelledby="size-choice-3-label"
-									/>
-									<span id="size-choice-3-label">M</span>
-									<!--
-                    Active: "border", Not Active: "border-2"
-                    Checked: "border-indigo-500", Not Checked: "border-transparent"
-                  -->
-									<span class="pointer-events-none absolute -inset-px rounded-md" aria-hidden="true"></span>
-								</label>
-								<!-- Active: "ring-2 ring-indigo-500" -->
-								<label
-									class="group relative flex cursor-pointer items-center justify-center rounded-md border bg-white px-4 py-3 text-sm font-medium uppercase text-gray-900 shadow-sm hover:bg-gray-50 focus:outline-none sm:flex-1 sm:py-6"
-								>
-									<input
-										type="radio"
-										name="size-choice"
-										value="L"
-										class="sr-only"
-										aria-labelledby="size-choice-4-label"
-									/>
-									<span id="size-choice-4-label">L</span>
-									<!--
-                    Active: "border", Not Active: "border-2"
-                    Checked: "border-indigo-500", Not Checked: "border-transparent"
-                  -->
-									<span class="pointer-events-none absolute -inset-px rounded-md" aria-hidden="true"></span>
-								</label>
-								<!-- Active: "ring-2 ring-indigo-500" -->
-								<label
-									class="group relative flex cursor-pointer items-center justify-center rounded-md border bg-white px-4 py-3 text-sm font-medium uppercase text-gray-900 shadow-sm hover:bg-gray-50 focus:outline-none sm:flex-1 sm:py-6"
-								>
-									<input
-										type="radio"
-										name="size-choice"
-										value="XL"
-										class="sr-only"
-										aria-labelledby="size-choice-5-label"
-									/>
-									<span id="size-choice-5-label">XL</span>
-									<!--
-                    Active: "border", Not Active: "border-2"
-                    Checked: "border-indigo-500", Not Checked: "border-transparent"
-                  -->
-									<span class="pointer-events-none absolute -inset-px rounded-md" aria-hidden="true"></span>
-								</label>
-								<!-- Active: "ring-2 ring-indigo-500" -->
-								<label
-									class="group relative flex cursor-pointer items-center justify-center rounded-md border bg-white px-4 py-3 text-sm font-medium uppercase text-gray-900 shadow-sm hover:bg-gray-50 focus:outline-none sm:flex-1 sm:py-6"
-								>
-									<input
-										type="radio"
-										name="size-choice"
-										value="2XL"
-										class="sr-only"
-										aria-labelledby="size-choice-6-label"
-									/>
-									<span id="size-choice-6-label">2XL</span>
-									<!--
-                    Active: "border", Not Active: "border-2"
-                    Checked: "border-indigo-500", Not Checked: "border-transparent"
-                  -->
-									<span class="pointer-events-none absolute -inset-px rounded-md" aria-hidden="true"></span>
-								</label>
-								<!-- Active: "ring-2 ring-indigo-500" -->
-								<label
-									class="group relative flex cursor-pointer items-center justify-center rounded-md border bg-white px-4 py-3 text-sm font-medium uppercase text-gray-900 shadow-sm hover:bg-gray-50 focus:outline-none sm:flex-1 sm:py-6"
-								>
-									<input
-										type="radio"
-										name="size-choice"
-										value="3XL"
-										class="sr-only"
-										aria-labelledby="size-choice-7-label"
-									/>
-									<span id="size-choice-7-label">3XL</span>
-									<!--
-                    Active: "border", Not Active: "border-2"
-                    Checked: "border-indigo-500", Not Checked: "border-transparent"
-                  -->
-									<span class="pointer-events-none absolute -inset-px rounded-md" aria-hidden="true"></span>
-								</label>
-							</div>
-						</fieldset>
+						<Button type="submit" class=" w-full" colorway="accent">In den Warenkorb</Button>
 					</div>
-
-					<Button type="submit" class="mt-12 w-full" colorway="accent">Zum Warenkorb hinzufügen</Button>
 				</form>
 			</div>
 
 			<div
-				class="py-10 lg:col-span-2 lg:col-start-1 lg:border-r lg:border-gray-200 lg:pb-16 lg:pr-8 lg:pt-6"
+				class=" lg:col-span-2 lg:col-start-1 lg:border-r lg:border-gray-200 lg:pb-16 lg:pr-8 lg:pt-6"
 			>
-				<!-- Description and details -->
-				<div>
-					<h3 class="sr-only">Description</h3>
+				<div class="mt-10 flex flex-col gap-5">
+					<Accordion open={true}>
+						<span slot="head">Beschreibung</span>
+						<span slot="details" class="contents">
+							{#if data.product.metadata?.description}
+								<div class="prose">
+									<!-- eslint-disable-next-line svelte/no-at-html-tags-->
+									{@html data.product.metadata.description}
+								</div>
+							{/if}
+						</span>
+					</Accordion>
 
-					<div class="space-y-6">
-						<p class="text-base text-gray-900">
-							The Basic Tee 6-Pack allows you to fully express your vibrant personality with three
-							grayscale options. Feeling adventurous? Put on a heather gray tee. Want to be a trendsetter?
-							Try our exclusive colorway: &quot;Black&quot;. Need to add an extra pop of color to your
-							outfit? Our white tee has you covered.
-						</p>
-					</div>
-				</div>
+					<Accordion open={true}>
+						<span slot="head">Mehr zu diesem Produkt</span>
 
-				<div class="mt-10">
-					<h3 class="text-sm font-medium text-gray-900">Highlights</h3>
-
-					<div class="mt-4">
-						<ul role="list" class="list-disc space-y-2 pl-4 text-sm">
-							<li class="text-gray-400"><span class="text-gray-600">Hand cut and sewn locally</span></li>
-							<li class="text-gray-400">
-								<span class="text-gray-600">Dyed with our proprietary colors</span>
-							</li>
-							<li class="text-gray-400"><span class="text-gray-600">Pre-washed &amp; pre-shrunk</span></li>
-							<li class="text-gray-400"><span class="text-gray-600">Ultra-soft 100% cotton</span></li>
-						</ul>
-					</div>
-				</div>
-
-				<div class="mt-10">
-					<h2 class="text-sm font-medium text-gray-900">Details</h2>
-
-					<div class="mt-4 space-y-6">
-						<p class="text-sm text-gray-600">
-							The 6-Pack includes two black, two white, and two heather gray Basic Tees. Sign up for our
-							subscription service and be the first to get new, exciting colors, like our upcoming
-							&quot;Charcoal Gray&quot; limited release.
-						</p>
-					</div>
+						<div slot="details" class="[&_p]:leading-relaxed">
+							<Details product={$selected_variant} />
+						</div>
+					</Accordion>
 				</div>
 			</div>
 		</div>
 	</div>
-</div>
-<pre>{JSON.stringify(data.product, null, 2)}</pre>
+</section>
+
+<section class="relative py-6">
+	<div
+		class="max-w-layout bg-accent relative z-0 mx-auto overflow-hidden rounded-3xl px-4 py-8 text-white [background-image:radial-gradient(circle,_color-mix(in_srgb,theme(colors.accent.DEFAULT),theme(colors.secondary.DEFAULT)_40%)_1px,_rgba(0,_0,_0,_0)_1px)] [background-size:40px_40px] sm:px-6 sm:py-12 lg:px-8"
+	>
+		<div
+			class="absolute inset-0 -z-10 [background:linear-gradient(to_bottom,_theme(colors.accent.DEFAULT/60%),_rgba(255,_255,_255,_0))]"
+		></div>
+
+		<header class="text-center">
+			<h2 class="text-xl font-bold sm:text-3xl">Ähnliche Produkte</h2>
+		</header>
+		{#await data.other_products then products}
+			{#if products.length > 0}
+				<ul class="flex flex-col gap-2 px-2 py-4 md:flex-row">
+					{#each products as product}
+						<li class=" flex-1 overflow-hidden rounded-lg lg:max-w-none">
+							<a href="/s/p/{product.handle}" class="group relative block overflow-hidden">
+								<img
+									src={product.thumbnail}
+									alt=""
+									class=" w-full object-cover transition duration-500 group-hover:opacity-70"
+								/>
+								<div
+									class="to-accent/40 absolute inset-0 bg-gradient-to-b from-transparent to-95% opacity-0 transition-opacity group-hover:opacity-100"
+								></div>
+
+								<div
+									class="border-accent-300 absolute bottom-0 left-0 right-0 z-20 flex translate-y-8 flex-col items-start justify-end rounded-t-[24px] bg-white/40 px-6 py-2 shadow-[0px_-4px_16px_rgba(17,17,26,0.1),_0px_8px_24px_rgba(17,17,26,0.1),_0px_16px_56px_rgba(17,17,26,0.1)] transition-all group-hover:translate-y-0 group-hover:bg-white/90 group-hover:shadow-lg"
+								>
+									<h3 class="text-accent text-xl font-extrabold">{product.title}</h3>
+
+									<span
+										class="bg-accent mt-1.5 flex items-center justify-center gap-2 rounded-lg px-2 py-1 text-xs font-medium uppercase tracking-wide text-white"
+									>
+										Ansehen
+									</span>
+								</div>
+							</a>
+						</li>
+					{/each}
+				</ul>
+			{/if}
+		{/await}
+	</div>
+</section>
