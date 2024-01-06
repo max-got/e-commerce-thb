@@ -4,7 +4,7 @@ import { medusa_client } from '$lib/server/medusa';
 import type { PageServerLoad } from './$types';
 
 export const load = (async ({ locals }) => {
-	console.log('LOAD MAIN');
+	
 	const get_products = async () => {
 		try {
 			const products = await medusa_client.products.list({
