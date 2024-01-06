@@ -2,12 +2,10 @@
 	export let images = [];
 </script>
 
-<div
-	class="gallery mx-auto mt-6 max-w-2xl sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-2 lg:gap-x-8 lg:px-8"
->
+<div class="gallery mx-auto sm:px-6 lg:grid lg:grid-cols-2 lg:gap-x-8 lg:px-8">
 	{#if images.length === 1}
 		{#each images as img, index}
-			<div class="aspect-h-4 aspect-w-3 block overflow-hidden rounded-lg">
+			<div class="aspect-h-4 aspect-w-3 block overflow-hidden">
 				<img
 					src={img.url}
 					alt="Two each of gray, white, and black shirts laying flat."
@@ -16,7 +14,7 @@
 			</div>
 		{/each}
 	{:else}
-		<div class="  overflow-hidden rounded-lg lg:block">
+		<div class="overflow-hidden lg:block">
 			<img
 				src={images[0].url}
 				alt="Two each of gray, white, and black shirts laying flat."
