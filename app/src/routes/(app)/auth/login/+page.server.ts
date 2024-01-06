@@ -9,7 +9,6 @@ import { login_post_request } from '../_validators';
 export const load = (async ({ locals, url }) => {
 	const rurl = url.searchParams.get('rurl') || '';
 	const code = url.searchParams.get('code') || '';
-	console.log(rurl);
 	if (locals.user) {
 		redirect(302, `/${rurl}`);
 	}
@@ -37,10 +36,8 @@ export const actions: Actions = {
 			return message(form, 'Invalid email/password combination', { status: 401 });
 		}
 
-		console.log(login.response);
 		const set_cookie = login.response.headers['set-cookie']?.[0] as string;
-		console.log(set_cookie);
-		//parse cookie
+
 		const cookie = parse(set_cookie);
 
 		cookies.set('sid', cookie['connect.sid'], {
