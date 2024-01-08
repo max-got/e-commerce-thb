@@ -52,7 +52,6 @@
 			switch (result.type) {
 				case 'success':
 					toast.success(`${data.product.title}`, {
-						position: 'top-center',
 						description: ' wurde zum Warenkorb hinzugefügt',
 						descriptionClass: '!text-[.6rem]',
 						style: 'font-size:.8rem;',
@@ -70,7 +69,6 @@
 
 				case 'error':
 					toast.error(`${data.product.title}`, {
-						position: 'top-center',
 						description: ' konnte nicht zum Warenkorb hinzugefügt werden',
 						descriptionClass: '!text-[.6rem]',
 						style: 'font-size:.8rem;',
@@ -88,7 +86,6 @@
 
 				case 'failure':
 					toast.error(`${data.product.title}`, {
-						position: 'top-center',
 						description: ' konnte nicht zum Warenkorb hinzugefügt werden',
 						descriptionClass: '!text-[.6rem]',
 						style: 'font-size:.8rem;',

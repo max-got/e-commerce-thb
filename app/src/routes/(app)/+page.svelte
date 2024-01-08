@@ -16,8 +16,7 @@
 		toast.success(`Erfolgreich eingeloggt, ${$page.data.locals?.student?.name ?? ''}`, {
 			description: 'Herzlich Willkommen in unserem Shop!',
 			descriptionClass: '!text-xs',
-			invert: true,
-			position: 'top-right'
+			invert: true
 		});
 
 		//delete the query param

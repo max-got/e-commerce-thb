@@ -17,4 +17,4 @@
 	<Footer />
 </div>
 
-<Toaster richColors />
+<Toaster richColors position="bottom-right" />

@@ -15,7 +15,6 @@
 		return async ({ result, update }) => {
 			if (result.type === 'success') {
 				toast.success('Erfolgreich ausgeloggt', {
-					position: 'top-center',
 					description: 'Bis zum nächsten Mal!',
 					descriptionClass: '!text-xs',
 					invert: true,
