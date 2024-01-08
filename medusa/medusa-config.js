@@ -24,7 +24,6 @@ try {
 const plugins = [
 	`medusa-fulfillment-manual`,
 	`medusa-payment-manual`,
-
 	{
 		resolve: '@medusajs/admin',
 		/** @type {import('@medusajs/admin').PluginOptions} */
@@ -57,13 +56,13 @@ const modules = {
 	eventBus: {
 		resolve: '@medusajs/event-bus-redis',
 		options: {
-			redisUrl: REDIS_URL,
+			redisUrl: process.env.REDIS_URL,
 		},
 	},
 	cacheService: {
 		resolve: '@medusajs/cache-redis',
 		options: {
-			redisUrl: REDIS_URL,
+			redisUrl: process.env.REDIS_URL,
 		},
 	},
 };
