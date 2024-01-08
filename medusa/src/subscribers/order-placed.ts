@@ -6,7 +6,7 @@ export default async function handleOrderPlaced({ data, container }: SubscriberA
 		const orderService: OrderService = container.resolve('orderService');
 
 		const order = await orderService.retrieve(data.id, {
-			select: ['id', 'display_id', 'total', 'shipping_methods', 'shipping_address', 'items'],
+			select: ['id', 'display_id', 'email', 'total', 'shipping_methods', 'shipping_address', 'items'],
 			relations: ['items', 'shipping_address', 'shipping_methods', 'shipping_methods.shipping_option'],
 		});
 
