@@ -48,6 +48,7 @@
 		"@fontsource-variable/inter": "^5.0.15",
 		"@fontsource/ibm-plex-mono": "^5.0.8",
 		"@medusajs/medusa-js": "^6.1.4",
+		"@splidejs/svelte-splide": "^0.2.9",
 		"clsx": "^2.0.0",
 		"cookie": "^0.6.0",
 		"just-debounce-it": "^3.2.0",
