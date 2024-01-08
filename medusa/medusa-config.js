@@ -21,12 +21,6 @@ try {
 	dotenv.config({ path: process.cwd() + '/' + ENV_FILE_NAME });
 } catch (e) {}
 
-// // CORS when consuming Medusa from admin
-const ADMIN_CORS = process.env.ADMIN_CORS || 'http://localhost:7000,http://localhost:7001';
-
-// // CORS to avoid issues when consuming Medusa from a client
-const STORE_CORS = process.env.STORE_CORS || 'http://localhost:8000';
-
 const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 
 const plugins = [
@@ -39,7 +33,9 @@ const plugins = [
 		options: {
 			autoRebuild: true,
 			develop: {
-				open: process.env.OPEN_BROWSER !== 'false',
+				logLevel: 'verbose',
+				stats: 'debug',
+				open: false,
 			},
 		},
 	},
@@ -47,34 +43,47 @@ const plugins = [
 		resolve: `medusa-file-supabase`,
 		options: {
 			project_ref: process.env.SUPABASE_PROJECT_REF,
-			service_key: process.env.SUPABASE_SERIVCE_KEY,
+			service_key: process.env.SUPABASE_SERVICE_KEY,
 			bucket_name: process.env.SUPABASE_IMAGE_BUCKET_NAME,
+		},
+	},
+	{
+		resolve: 'medusa-plugin-variant-images',
+		options: {
+			enableUI: true,
 		},
 	},
 ];
 
-const modules = {
-	eventBus: {
-		resolve: '@medusajs/event-bus-redis',
-		options: {
-			redisUrl: REDIS_URL,
-		},
-	},
-	cacheService: {
-		resolve: '@medusajs/cache-redis',
-		options: {
-			redisUrl: REDIS_URL,
-		},
-	},
-};
+const modules =
+	process.env.NODE_ENV === 'production'
+		? {
+				eventBus: {
+					resolve: '@medusajs/event-bus-redis',
+					options: {
+						redisUrl: REDIS_URL,
+					},
+				},
+				cacheService: {
+					resolve: '@medusajs/cache-redis',
+					options: {
+						redisUrl: REDIS_URL,
+					},
+				},
+		  }
+		: {
+				eventBus: {
+					resolve: '@medusajs/event-bus-local',
+				},
+		  };
 
 /** @type {import('@medusajs/medusa').ConfigModule["projectConfig"]} */
 const projectConfig = {
 	jwtSecret: process.env.JWT_SECRET,
 	cookieSecret: process.env.COOKIE_SECRET,
-	store_cors: STORE_CORS,
+	store_cors: process.env.STORE_CORS,
 	database_url: process.env.SUPABASE_DATABASE_URL,
-	admin_cors: ADMIN_CORS,
+	admin_cors: process.env.ADMIN_CORS,
 	// Uncomment the following lines to enable REDIS
 	redis_url: REDIS_URL,
 };
