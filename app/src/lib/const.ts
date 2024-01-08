@@ -1,5 +1,5 @@
 export const COMPANY_INFOS = {
-	name: 'Zenit',
+	name: 'Zenit GmbH',
 	street: 'Musterstraße 1',
 	zip: '12345',
 	city: 'Musterstadt',
