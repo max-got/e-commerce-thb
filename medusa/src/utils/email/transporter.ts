@@ -3,7 +3,7 @@ import nodemailer from 'nodemailer';
 const dotenv = require('dotenv');
 
 export const transporter = nodemailer.createTransport({
-	...(process.env.NODE_ENV !== 'production'
+	...(process.env.NODE_ENV === 'production'
 		? {
 				host: process.env.EMAIL_SERVER,
 				port: 465,
