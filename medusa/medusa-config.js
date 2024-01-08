@@ -21,8 +21,6 @@ try {
 	dotenv.config({ path: process.cwd() + '/' + ENV_FILE_NAME });
 } catch (e) {}
 
-const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
-
 const plugins = [
 	`medusa-fulfillment-manual`,
 	`medusa-payment-manual`,
@@ -55,27 +53,20 @@ const plugins = [
 	},
 ];
 
-const modules =
-	process.env.NODE_ENV === 'production'
-		? {
-				eventBus: {
-					resolve: '@medusajs/event-bus-redis',
-					options: {
-						redisUrl: REDIS_URL,
-					},
-				},
-				cacheService: {
-					resolve: '@medusajs/cache-redis',
-					options: {
-						redisUrl: REDIS_URL,
-					},
-				},
-		  }
-		: {
-				eventBus: {
-					resolve: '@medusajs/event-bus-local',
-				},
-		  };
+const modules = {
+	eventBus: {
+		resolve: '@medusajs/event-bus-redis',
+		options: {
+			redisUrl: REDIS_URL,
+		},
+	},
+	cacheService: {
+		resolve: '@medusajs/cache-redis',
+		options: {
+			redisUrl: REDIS_URL,
+		},
+	},
+};
 
 /** @type {import('@medusajs/medusa').ConfigModule["projectConfig"]} */
 const projectConfig = {
@@ -85,7 +76,7 @@ const projectConfig = {
 	database_url: process.env.SUPABASE_DATABASE_URL,
 	admin_cors: process.env.ADMIN_CORS,
 	// Uncomment the following lines to enable REDIS
-	redis_url: REDIS_URL,
+	redis_url: process.env.REDIS_URL,
 };
 
 /** @type {import('@medusajs/medusa').ConfigModule} */
