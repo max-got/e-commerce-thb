@@ -10,7 +10,6 @@ export default async function handleOrderPlaced({ data, container }: SubscriberA
 			relations: ['items', 'shipping_address', 'shipping_methods', 'shipping_methods.shipping_option'],
 		});
 
-		console.log(JSON.stringify(order, null, 2));
 		await send_order_placed_email(order);
 	} catch (error) {
 		console.log('Error handling order placed', error);
