@@ -1,6 +1,6 @@
 <button
 	type="button"
-	class="mb-2 mr-2 inline-flex items-center rounded-lg bg-[#F7BE38] px-5 py-2.5 text-center text-sm font-medium text-gray-900 hover:bg-[#F7BE38]/90 focus:ring-4 focus:ring-[#F7BE38]/50 dark:focus:ring-[#F7BE38]/50"
+	class="inline-flex items-center rounded-lg bg-[#F7BE38] px-5 py-2.5 text-center text-sm font-medium text-gray-900"
 >
 	<svg
 		class="-ml-1 mr-2 h-4 w-4"

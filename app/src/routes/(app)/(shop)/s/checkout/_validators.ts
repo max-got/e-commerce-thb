@@ -1,6 +1,19 @@
 import { z } from 'zod';
 
-export const checkout = z.object({
+export const shipping_option = z.object({
+	shipping_option: z.string()
+});
+
+export type ShippingOption = typeof shipping_option;
+
+export const discount_zod = z.object({
+	discount: z.string()
+});
+
+export type DiscountFormZod = typeof discount_zod;
+
+//DELETE
+export const address_form_zod = z.object({
 	email: z.string().email({ message: 'E-Mail ist erforderlich' }),
 	first_name: z.string().min(1, { message: 'Vorname ist erforderlich' }),
 	last_name: z.string().min(1, { message: 'Nachname ist erforderlich' }),
@@ -16,17 +29,5 @@ export const checkout = z.object({
 	}),
 	country_code: z.string().default('de')
 });
-
-export type Checkout = typeof checkout;
-
-export const shipping_option = z.object({
-	shipping_option: z.string()
-});
-
-export type ShippingOption = typeof shipping_option;
-
-export const discount = z.object({
-	discount: z.string()
-});
-
-export type Discount = typeof discount;
+//DELETE
+export type AddressFormZod = typeof address_form_zod;

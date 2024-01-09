@@ -49,7 +49,11 @@ export const actions: Actions = {
 		} catch (error) {
 			if (is_medusa_error(error)) {
 				const { code } = error.response.data;
-				return fail(500, { message: code });
+				const user_message =
+					code.toUpperCase() === 'INSUFFICIENT_INVENTORY'
+						? 'Nicht genügend Lagerbestand'
+						: 'Fehler beim Hinzufügen zum Warenkorb';
+				return fail(500, { message: user_message });
 			}
 			return fail(500, { message: 'Could not add item to cart' });
 		}

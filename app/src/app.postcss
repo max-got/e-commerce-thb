@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 @layer base {
+	body {
+		@apply font-body leading-relaxed tracking-tighter text-gray-700;
+	}
+
 	h1,
 	h2,
 	h3,
@@ -39,10 +43,6 @@
 
 	p {
 		text-wrap: balance;
-	}
-	p,
-	label {
-		@apply font-body leading-relaxed tracking-tighter text-gray-700;
 	}
 
 	label {

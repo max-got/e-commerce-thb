@@ -1,5 +1,5 @@
 <div
-	class="inline-flex items-center rounded-lg bg-[#050708] px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-[#050708]/80"
+	class="inline-flex items-center rounded-lg bg-[#050708] px-5 py-2.5 text-center text-sm font-medium text-white"
 >
 	Apple Pay
 	<svg

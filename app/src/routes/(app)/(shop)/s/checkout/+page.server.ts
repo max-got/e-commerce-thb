@@ -3,88 +3,44 @@ import type { Order } from '@medusajs/medusa';
 import { fail } from '@sveltejs/kit';
 import { message, superValidate } from 'sveltekit-superforms/server';
 import type { Actions, PageServerLoad } from './$types';
-import { checkout, discount, shipping_option } from './_validators';
+import { address_form_zod, discount_zod, shipping_option } from './_validators';
 
 export const load: PageServerLoad = async function ({ locals }) {
-	//forms
-	const checkout_form = await superValidate(
-		// {
-		// 	first_name: locals.user?.shipping_addresses?.[0]?.first_name || '',
-		// 	last_name: locals.user?.shipping_addresses?.[0]?.last_name || '',
-		// 	email: locals.user?.email || '',
-		// 	phone: locals.user?.shipping_addresses?.[0]?.phone || '',
-		// 	country_code: locals.user?.shipping_addresses?.[0]?.country_code || '',
-		// 	address_1: locals.user?.shipping_addresses?.[0]?.address_1 || '',
-		// 	city: locals.user?.shipping_addresses?.[0]?.city || '',
-		// 	postal_code: locals.user?.shipping_addresses?.[0]?.postal_code || '',
-		// 	province: locals.user?.shipping_addresses?.[0]?.province || ''
-		// },
+	//could be in locals.user or in locals.cart
+	const current_address_data =
+		locals.user?.shipping_addresses?.[0] || locals.cart?.shipping_address;
+	const current_email = locals.user?.email || locals.cart?.email;
+
+	const address_form = await superValidate(
 		{
-			first_name: 'Max',
-			last_name: 'Mustermann',
-			email: 'max.got@mailbox.org',
-			address_1: 'Musterstraße 1',
-			city: 'Musterstadt',
-			postal_code: '12345',
-			province: 'Musterland'
+			first_name: current_address_data?.first_name || '',
+			last_name: current_address_data?.last_name || '',
+			email: current_email || '',
+			phone: current_address_data?.phone || '',
+			country_code: current_address_data?.country_code || '',
+			address_1: current_address_data?.address_1 || '',
+			city: current_address_data?.city || '',
+			postal_code: current_address_data?.postal_code || '',
+			province: current_address_data?.province || ''
 		},
-		checkout,
+
+		address_form_zod,
 		{
 			errors: false
 		}
 	);
 	const shipping_options_form = await superValidate(shipping_option);
-	const discount_form = await superValidate(discount);
-
-	const get_shipping_options = async () => {
-		try {
-			const shipping_options = await medusa_client.shippingOptions.listCartOptions(locals.cartid);
-
-			if (!shipping_options.shipping_options.length) {
-				return [];
-			}
-			const ordered_shipping_options = shipping_options.shipping_options.sort((a, b) => {
-				if (!a.amount || !b.amount) return 0;
-
-				if (a.amount > b.amount) {
-					return 1;
-				}
-
-				if (a.amount < b.amount) {
-					return -1;
-				}
-				return 0;
-			});
-
-			await medusa_client.carts.addShippingMethod(locals.cartid, {
-				option_id: ordered_shipping_options[0].id as string
-			});
-
-			return ordered_shipping_options;
-		} catch (error) {
-			console.error('Error fetching shipping options:', error);
-			return [];
-		}
-	};
-
-	const get_payment_options = async () => {
-		try {
-			await medusa_client.carts.createPaymentSessions(locals.cartid);
-		} catch (error) {
-			console.error('Error fetching shipping options:', error);
-			return [];
-		}
-	};
+	const discount_form = await superValidate(discount_zod);
 
 	return {
 		user: locals.user,
 		cart: locals.cart,
-		shipping_options: locals?.cart?.shipping_address ? await get_shipping_options() : [],
-		payment_providers: locals?.cart?.shipping_address ? await get_payment_options() : [],
+		is_logged_in: locals.user !== null,
+
 		forms: {
-			checkout_form,
 			shipping_options_form,
-			discount_form
+			discount_form,
+			address_form
 		}
 	};
 };
@@ -92,10 +48,14 @@ export const load: PageServerLoad = async function ({ locals }) {
 export const actions: Actions = {
 	complete: async ({ locals, cookies }) => {
 		try {
-			const order = await medusa_client.carts.complete(locals.cartid, {
-				Cookie: `connect.sid=${locals.sid}`
-			});
-			if (!order.data) return fail(400, { success: false });
+			if (!locals.cartid) {
+				return fail(404, { success: false });
+			}
+
+			const perf_start = performance.now();
+			const order = await medusa_client.carts.complete(locals.cartid);
+			const perf_end = performance.now();
+			console.log('complete order time', `${perf_end - perf_start}ms`);
 
 			cookies.set('cartid', '', {
 				path: '/',
@@ -104,41 +64,47 @@ export const actions: Actions = {
 				httpOnly: true,
 				secure: true
 			});
+
 			locals.cartid = '';
 
 			return { success: true, order: order.data as Order };
 		} catch (error) {
+			//!TODO: handle error
+			console.log('Error completing order', error);
+
 			return fail(400, { success: false });
 		}
 	},
 
-	shipping_option: async ({ request, locals }) => {
+	add_shipping_option: async ({ request, locals }) => {
 		const form = await superValidate(request, shipping_option);
+		try {
+			if (!form.valid) {
+				return message(form, 'Something went wrong', { status: 500 }); // this shouldn't happen because of client-side validation
+			}
 
-		if (!form.valid) {
-			return message(form, 'Something went wrong', { status: 500 }); // this shouldn't happen because of client-side validation
-		}
+			if (!locals.cartid) {
+				console.log('NO CART');
+				return message(form, 'Warenkorb konnte nicht gefunden werden.', { status: 404 });
+			}
 
-		if (!locals.cartid) {
-			console.log('NO CART');
-			return message(form, 'Warenkorb konnte nicht gefunden werden.', { status: 404 });
-		}
-
-		await medusa_client.carts
-			.addShippingMethod(locals.cartid, {
+			const cart = await medusa_client.carts.addShippingMethod(locals.cartid, {
 				option_id: form.data.shipping_option
-			})
-			.catch(() => {
-				console.log('ERROR');
-				//!TODO: handle error
-				return message(form, 'Something went wrong', { status: 500 });
 			});
 
-		return message(form, 'Shipping option added');
+			locals.cart = cart.cart;
+
+			return message(form, 'Shipping option added');
+		} catch (error) {
+			//!TODO: handle error
+			console.log('Error adding shipping options:', error);
+
+			return message(form, 'Something went wrong', { status: 500 });
+		}
 	},
 
-	guest_checkout: async ({ request, locals }) => {
-		const form = await superValidate(request, checkout);
+	add_address: async ({ request, locals }) => {
+		const form = await superValidate(request, address_form_zod);
 		try {
 			if (!form.valid) {
 				return message(form, 'Something went wrong', { status: 500 }); // this shouldn't happen because of client-side validation
@@ -148,7 +114,7 @@ export const actions: Actions = {
 				return message(form, 'Warenkorb konnte nicht gefunden werden.', { status: 404 });
 			}
 
-			await medusa_client.carts.update(locals.cartid, {
+			const cart = await medusa_client.carts.update(locals.cartid, {
 				customer_id: locals.user?.id,
 				email: form.data.email,
 				country_code: form.data.country_code,
@@ -163,42 +129,82 @@ export const actions: Actions = {
 				}
 			});
 
+			locals.cart = cart.cart;
+
 			return message(form, {
 				success: true
 			});
 		} catch (error) {
 			//!TODO: handle error
+			console.log('Error adding address', error);
 			return message(form, 'Something went wrong', { status: 500 });
 		}
 	},
 
 	add_discount: async ({ request, locals }) => {
-		const form = await superValidate(request, discount);
+		const form = await superValidate(request, discount_zod);
+		try {
+			if (!form.valid) {
+				return message(form, 'Something went wrong', { status: 500 }); // this shouldn't happen because of client-side validation
+			}
 
-		if (!form.valid) {
-			return message(form, 'Something went wrong', { status: 500 }); // this shouldn't happen because of client-side validation
-		}
+			if (!locals.cartid) {
+				return message(form, 'Warenkorb konnte nicht gefunden werden.', { status: 404 });
+			}
 
-		if (!locals.cartid) {
-			return message(form, 'Warenkorb konnte nicht gefunden werden.', { status: 404 });
-		}
-
-		return await medusa_client.carts
-			.update(locals.cartid, {
+			const cart = await medusa_client.carts.update(locals.cartid, {
 				discounts: [
 					{
 						code: form.data.discount
 					}
 				]
-			})
-			.then(() => {
-				return message(form, 'Discount added');
-			})
-			.catch((err) => {
-				if (err.response?.data?.type === 'not_found') {
-					return message(form, 'Der Code existiert nicht.', { status: 404 });
-				}
-				return message(form, 'Something went wrong', { status: 500 });
 			});
+
+			locals.cart = cart.cart;
+
+			return message(form, 'Code wurde hinzugefügt.');
+		} catch (error) {
+			//!TODO: handle error
+			console.log('Error adding discount', error);
+			//IK, is from medusa
+			//Reicht für das Projekt aus, da keine Gutscheincodes mit regeln etc. angewendet werden
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const err = error as any;
+			if (err.response?.data?.type === 'not_found') {
+				return message(form, 'Der Code existiert nicht oder ist abgelaufen.', { status: 404 });
+			}
+			return message(form, 'Something went wrong', { status: 500 });
+		}
+	},
+
+	delete_discount: async ({ locals }) => {
+		try {
+			if (!locals.cartid) {
+				return fail(404, { success: false });
+			}
+
+			const cart = await medusa_client.carts.update(locals.cartid, { discounts: [] });
+
+			locals.cart = cart.cart;
+
+			return { success: true };
+		} catch (error) {
+			//!TODO: handle error
+			console.log('Error deleting discount', error);
+			return fail(400, { success: false });
+		}
+	},
+
+	add_payment_session: async ({ locals }) => {
+		try {
+			const create_payment_session = await medusa_client.carts.createPaymentSessions(locals.cartid);
+
+			locals.cart = create_payment_session.cart;
+
+			return { success: true };
+		} catch (error) {
+			console.log('Error creating payment session', error);
+			return fail(400, { success: false });
+		}
 	}
 };
