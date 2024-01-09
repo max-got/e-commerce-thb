@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { Product } from '@medusajs/medusa';
-	export let featured_products: Product[] = [];
+	import type { PricedProduct } from '@medusajs/medusa/dist/types/pricing';
+	export let featured_products: PricedProduct[] = [];
 
 	import ArrowRight from '~icons/ph/arrow-right';
 </script>
