@@ -20,7 +20,7 @@
 </script>
 
 <h3 class="text-primary mb-4 text-center text-3xl">Registrieren</h3>
-<p class="mb-10 text-center text-lg">
+<p class="text-accent mb-10 text-center text-lg">
 	Hier kannst du dich registrieren, um alle Funktionen von {COMPANY_INFOS.name} nutzen zu können.
 </p>
 

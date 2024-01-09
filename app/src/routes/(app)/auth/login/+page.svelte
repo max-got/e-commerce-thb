@@ -25,7 +25,7 @@
 </script>
 
 <h3 class="text-primary mb-4 text-center text-3xl">Login</h3>
-<p class="mb-10 text-center text-lg">
+<p class="text-accent mb-10 text-center text-lg">
 	Melde dich an, um alle Funktionen von {COMPANY_INFOS.name} nutzen zu können.
 </p>
 
@@ -65,7 +65,7 @@
 
 		<p class="mt-4 text-sm text-gray-500 sm:mt-0">
 			Du hast noch keinen Account?
-			<a href="/auth/login" class="text-gray-700 underline">Registrieren</a>.
+			<a href="/auth/register" class="text-gray-700 underline">Registrieren</a>.
 		</p>
 	</div>
 </form>
