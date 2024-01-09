@@ -13,6 +13,7 @@
 	},
 	"devDependencies": {
 		"@iconify-json/ph": "^1.1.8",
+		"@sveltejs/adapter-node": "^2.1.0",
 		"@sveltejs/adapter-vercel": "^4.0.2",
 		"@sveltejs/enhanced-img": "^0.1.6",
 		"@sveltejs/kit": "^2.0.0",
