@@ -18,11 +18,9 @@
 
 	export let data: PageData;
 
-	let product_title_ref: HTMLHeadingElement;
+	$: query_parameters = queryParameters<{ variant: string | null }>();
 
-	const query_parameters = queryParameters<{ variant: string | null }>();
-
-	const variant_query_param = queryParam('variant', {
+	$: variant_query_param = queryParam('variant', {
 		encode: (value: string) => value,
 		decode: (value: string | null) => (value ? value.toString() : null),
 		defaultValue: data.product.variants[0].title?.toLowerCase() || ''
@@ -36,7 +34,7 @@
 		);
 	});
 
-	selected_variant.subscribe(($selected_variant) => {
+	$: selected_variant.subscribe(($selected_variant) => {
 		if ($selected_variant) {
 			variant_query_param.set($selected_variant.title?.toLowerCase() || '');
 		}
@@ -48,6 +46,11 @@
 
 	const add_to_cart: SubmitFunction = async () => {
 		$loading = true;
+
+		//!TODO: optimistic update
+		//const variantId = formData.get('variantId');
+		//const variant = data.product.variants.find((variant) => variant.id === variantId);
+
 		return async ({ result, update }) => {
 			switch (result.type) {
 				case 'success':
@@ -122,6 +125,9 @@
 			);
 		}
 	});
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const notypecheck = (x: any) => x;
 </script>
 
 <section>
@@ -138,7 +144,7 @@
 					<div
 						class="xs:justify-between xs:flex-row flex w-full items-center gap-2 py-3 [@media(min-width:330px)]:flex-col [@media(min-width:370px)]:flex-row"
 					>
-						<h1 class="flex flex-col text-3xl font-extrabold" bind:this={product_title_ref}>
+						<h1 class="flex flex-col text-3xl font-extrabold">
 							{data.product.title}
 							<span
 								class="text-secondary-600 text-center text-sm font-light tracking-normal md:text-start"
@@ -167,6 +173,7 @@
 					<div>
 						<ul class="grid grid-flow-col-dense place-items-center justify-center gap-2">
 							{#each data.product.variants as variant (variant.id)}
+								{@const thumbnail = notypecheck(variant).thumbnail}
 								<li>
 									<input
 										type="radio"
@@ -180,9 +187,21 @@
 									/>
 									<label
 										for="product_variant_{variant.id}"
-										class="peer-checked:after:border-primary opacity-85 relative grid w-full cursor-pointer place-content-center peer-checked:opacity-100 peer-checked:after:absolute peer-checked:after:inset-0 peer-checked:after:block peer-checked:after:border-2"
+										class="peer-checked:after:border-primary opacity-85 max-w-40 relative grid w-full cursor-pointer place-content-center peer-checked:opacity-100 peer-checked:after:absolute peer-checked:after:inset-0 peer-checked:after:block peer-checked:after:border-2"
 									>
-										<img src={variant.thumbnail} class="size-full aspect-1 object-cover" alt="" />
+										<div
+											class="absolute bottom-0 left-0 right-0 grid place-items-center bg-white/60"
+										>
+											<p class="text-black">
+												{variant.title}
+											</p>
+											<p class="text-black">
+												{variant.original_price_incl_tax
+													? format_price(variant.original_price_incl_tax)
+													: ''}
+											</p>
+										</div>
+										<img src={thumbnail} class="size-full aspect-1 object-cover" alt="" />
 									</label>
 								</li>
 							{/each}
@@ -195,7 +214,8 @@
 								Variante: <span class="font-semibold">{$selected_variant.title}</span>
 							</h3>
 							<h3 class="mb-1 text-base font-normal">
-								Preis: <span class="font-semibold"
+								Preis:
+								<span class="font-semibold"
 									>{$selected_variant?.original_price_incl_tax
 										? format_price($selected_variant?.original_price_incl_tax)
 										: ''}</span
@@ -203,7 +223,11 @@
 							</h3>
 						</div>
 
-						<Button type="submit" class=" w-full" colorway="accent">In den Warenkorb</Button>
+						{#if $selected_variant_id}
+							<Button type="submit" class=" w-full" colorway="accent">In den Warenkorb</Button>
+						{:else}
+							<p>Bitte wählen Sie eine Variante aus</p>
+						{/if}
 					</div>
 				</form>
 			</div>
