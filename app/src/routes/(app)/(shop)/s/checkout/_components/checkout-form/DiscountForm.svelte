@@ -38,7 +38,6 @@
 
 	let open = false;
 
-	let form_ref: HTMLFormElement;
 	const delete_enhance: SubmitFunction = async () => {
 		$loading = true;
 		$form.discount = '';
