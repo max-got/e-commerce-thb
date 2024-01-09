@@ -1,4 +1,4 @@
-import type { ProductVariant } from '@medusajs/medusa';
+import type { PricedVariant } from '@medusajs/medusa/dist/types/pricing.d';
 import { writable } from 'svelte/store';
 
 const INVENTORY_STATUS = {
@@ -9,8 +9,8 @@ const INVENTORY_STATUS = {
 
 export type INVENTORY_STATUS = (typeof INVENTORY_STATUS)[keyof typeof INVENTORY_STATUS];
 
-function inventory_status(priced_product?: ProductVariant) {
-	const { set, update, subscribe } = writable<ProductVariant>();
+function inventory_status(priced_product?: PricedVariant) {
+	const { set, update, subscribe } = writable<PricedVariant>();
 
 	const quantity = priced_product?.inventory_quantity || 0;
 
