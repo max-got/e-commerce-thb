@@ -26,8 +26,8 @@
 		defaultValue: data.product.variants[0].title?.toLowerCase() || ''
 	});
 
-	const selected_variant_id = writable<string>(data.product.variants[0].id || '');
-	const selected_variant = derived(selected_variant_id, ($selected_variant_id) => {
+	$: selected_variant_id = writable<string>(data.product.variants[0].id || '');
+	$: selected_variant = derived(selected_variant_id, ($selected_variant_id) => {
 		return (
 			data.product.variants.find((variant) => variant.id === $selected_variant_id) ||
 			data.product.variants[0]
@@ -40,7 +40,7 @@
 		}
 	});
 
-	let inventory_status = derived(selected_variant, ($selected_variant) =>
+	$: inventory_status = derived(selected_variant, ($selected_variant) =>
 		inventory_status_store($selected_variant)
 	);
 
