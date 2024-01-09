@@ -123,7 +123,7 @@
 
 {#if !data.cart && form?.order}
 	<section class="px-4 py-2">
-		<div class="flex flex-col items-center justify-center gap-4 text-center">
+		<div class="flex h-screen flex-col items-center justify-center gap-4 text-center">
 			<h2 class="text-lg">Vielen Dank für deine Bestellung</h2>
 			<p>
 				Deine Bestellung wurde erfolgreich abgeschlossen. Du erhältst in Kürze eine Bestätigung per
