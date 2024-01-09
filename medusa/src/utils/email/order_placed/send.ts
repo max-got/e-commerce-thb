@@ -1,7 +1,7 @@
 import { Order } from '@medusajs/medusa';
 import Handlebars from 'handlebars';
 import { transporter } from '../transporter';
-
+const dotenv = require('dotenv');
 const template = `<!DOCTYPE html>
 <html lang="de">
 <head>
@@ -75,10 +75,10 @@ const template = `<!DOCTYPE html>
     <p>Zenit</p>
 
     <div style="display:flex; flex-direction:column; align-items:center;">
-    <p style="font-size:10px; margin-right:5px;"><a href="https://zenit.berlin">Zur Website</a></p>
-    <p style="font-size:10px; margin-right:5px;"><a href="https://zenit.berlin">Impressum</a></p>
-    <p style="font-size:10px; margin-right:5px;"><a href="https://zenit.berlin">Datenschutz</a></p>
-    <p style="font-size:10px;"><a href="https://zenit.berlin">Allgemeine Geschäftsbedingungen</a></p>
+    <p style="font-size:10px; margin-right:5px;"><a href="https://e-commerce-thb-app-production.up.railway.app">Zur Website</a></p>
+    <p style="font-size:10px; margin-right:5px;"><a href="https://e-commerce-thb-app-production.up.railway.app/imprint">Impressum</a></p>
+    <p style="font-size:10px; margin-right:5px;"><a href="https://e-commerce-thb-app-production.up.railway.app/privacy-policy">Datenschutz</a></p>
+    <p style="font-size:10px;"><a href="https://e-commerce-thb-app-production.up.railway.app/terms-and-conditions">Allgemeine Geschäftsbedingungen</a></p>
     </div>
 
 </body>
@@ -92,8 +92,8 @@ export async function send_order_placed_email(order: Order) {
 	const source = Handlebars.compile(template);
 
 	await transporter.sendMail({
-		from: 'zenit@zenit.de',
-		to: order.email,
+		from: process.env.EMAIL_USER,
+		to: process.env.EMAIL_USER,
 		subject: 'Vielen Dank für deine Bestellung!',
 		html: source({
 			first_name: order.shipping_address.first_name,
@@ -103,7 +103,7 @@ export async function send_order_placed_email(order: Order) {
 			shipping_option: order.shipping_methods[0].shipping_option.name,
 			id: order.display_id,
 			shipping_address: order.shipping_address,
-			vatRate: 1.19,
+			total: order.total,
 		}),
 	});
 }
