@@ -52,20 +52,27 @@ const plugins = [
 	},
 ];
 
-const modules = {
-	eventBus: {
-		resolve: '@medusajs/event-bus-redis',
-		options: {
-			redisUrl: process.env.REDIS_URL,
-		},
-	},
-	cacheService: {
-		resolve: '@medusajs/cache-redis',
-		options: {
-			redisUrl: process.env.REDIS_URL,
-		},
-	},
-};
+const modules =
+	process.env.NODE_ENV === 'production'
+		? {
+				eventBus: {
+					resolve: '@medusajs/event-bus-redis',
+					options: {
+						redisUrl: process.env.REDIS_URL,
+					},
+				},
+				cacheService: {
+					resolve: '@medusajs/cache-redis',
+					options: {
+						redisUrl: process.env.REDIS_URL,
+					},
+				},
+		  }
+		: {
+				eventBus: {
+					resolve: '@medusajs/event-bus-local',
+				},
+		  };
 
 /** @type {import('@medusajs/medusa').ConfigModule["projectConfig"]} */
 const projectConfig = {
@@ -75,7 +82,7 @@ const projectConfig = {
 	database_url: process.env.SUPABASE_DATABASE_URL,
 	admin_cors: process.env.ADMIN_CORS,
 	// Uncomment the following lines to enable REDIS
-	redis_url: process.env.REDIS_URL,
+	redis_url: process.env.NODE_ENV === 'production' ? process.env.REDIS_URL : undefined,
 };
 
 /** @type {import('@medusajs/medusa').ConfigModule} */
