@@ -27,7 +27,6 @@
 <form action="?/register" class="mt-8 grid grid-cols-6 gap-6" method="POST" use:enhance>
 	<div class="col-span-6 lg:col-span-3">
 		<label for="first_name" class="block text-sm font-medium text-gray-700">Vorname</label>
-
 		<input
 			type="text"
 			id="first_name"
