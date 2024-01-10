@@ -1,18 +1,16 @@
-import { MEDUSA_REGION_ID, MEDUSA_SALES_CHANNELS_IDS } from '$env/static/private';
+import { MEDUSA_REGION_ID } from '$env/static/private';
 import { medusa_client } from '$lib/server/medusa';
 
 import type { PageServerLoad } from './$types';
 
 export const load = (async ({ locals }) => {
-	
 	const get_products = async () => {
 		try {
 			const products = await medusa_client.products.list({
 				fields: 'id,title,handle,thumbnail',
 				limit: 10,
 				currency_code: 'eur',
-				region_id: MEDUSA_REGION_ID,
-				sales_channel_id: [MEDUSA_SALES_CHANNELS_IDS]
+				region_id: MEDUSA_REGION_ID
 			});
 
 			return products.products;
@@ -31,8 +29,9 @@ export const load = (async ({ locals }) => {
 		try {
 			const products = await medusa_client.products.list({
 				fields: 'id,title,handle,thumbnail',
-				expand: 'categories',
-				category_id: ['pcat_01HH08EXHS08BYPH79391TDKSJ']
+				currency_code: 'eur',
+				limit: 3,
+				region_id: MEDUSA_REGION_ID
 			});
 
 			return products.products;
