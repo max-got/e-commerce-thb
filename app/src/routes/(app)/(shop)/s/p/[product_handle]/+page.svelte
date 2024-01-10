@@ -13,8 +13,12 @@
 	import { derived, writable } from 'svelte/store';
 	import { inventory_status_store } from './utils';
 
+	import CertUvStandard from '$lib/assets/certificates/uv_standard_801.jpg?enhanced';
+	import CertRecycled from '$lib/assets/certificates/C000000_Recycled.png?enhanced';
+
 	import Accordion from './_components/Accordion.svelte';
 	import Details from './_components/utils/Details.svelte';
+	import Attributes from './_components/utils/Attributes.svelte';
 
 	export let data: PageData;
 
@@ -247,12 +251,96 @@
 							{/if}
 						</span>
 					</Accordion>
-
 					<Accordion open={true}>
-						<span slot="head">Mehr zu diesem Produkt</span>
+						<span slot="head">Details</span>
 
 						<div slot="details" class="[&_p]:leading-relaxed">
 							<Details product={$selected_variant} />
+						</div>
+					</Accordion>
+
+					<Accordion>
+						<span slot="head">Mehr zu diesem Produkt</span>
+
+						<div slot="details" class="[&_p]:leading-relaxed">
+							<Attributes product={$selected_variant} />
+						</div>
+					</Accordion>
+					<Accordion>
+						<span slot="head">Support-Kontaktdaten</span>
+
+						<div slot="details" class="flex flex-col gap-2 [&_p]:leading-relaxed">
+							<p>
+								Unser freundliches Kundensupport-Team steht Ihnen bei allen Fragen rund um unsere
+								Produkte zur Verfügung. Ob Sie Informationen zu einem bestimmten Modell benötigen,
+								Hilfe bei der Auswahl des richtigen Schirms für Ihre Bedürfnisse wünschen oder
+								einfach nur Ratschläge zur Pflege und Wartung suchen – wir sind für Sie da.
+								Kontaktieren Sie uns per E-Mail oder telefonisch, und wir werden uns bemühen, Ihre
+								Anfragen prompt zu beantworten.
+							</p>
+
+							<a href="mailto:customerservice@zenit-gmbh.de">customerservice@zenit-gmbh.de</a>
+							<a href="tel:+49 (0) 9876 54321 ">+49 (0) 9876 54321 </a>
+						</div>
+					</Accordion>
+					<Accordion>
+						<span slot="head">Reparaturservice?</span>
+
+						<div slot="details" class="flex flex-col gap-2 [&_p]:leading-relaxed">
+							<p>
+								Selbst die robustesten Regenschirme können gelegentlich eine kleine Auffrischung
+								benötigen. Unser erfahrener Reparaturservice steht bereit, um sicherzustellen, dass
+								Ihr Schirm wieder in Topform ist. Egal, ob es um einen gebrochenen Stab, ein
+								defektes Gestell oder andere Reparaturen geht – wir kümmern uns darum. Senden Sie
+								uns einfach Ihren Schirm, und wir werden ihn sorgfältig überprüfen und
+								instandsetzen, um sicherzustellen, dass er Sie weiterhin bei jedem Regenschauer
+								schützt.
+							</p>
+
+							<a href="mailto:customerservice@zenit-gmbh.de">customerservice@zenit-gmbh.de</a>
+							<a href="tel:+49 (0) 9876 54321 ">+49 (0) 9876 54321 </a>
+						</div>
+					</Accordion>
+					<Accordion open={true}>
+						<span slot="head">Zertifizierungen</span>
+
+						<div slot="details" class="[&_p]:leading-relaxed">
+							<div class="grid gap-4 lg:grid-cols-2">
+								<div class="flex flex-col items-start gap-2">
+									<h3 class="text-lg">UV Schutz – UV-Standard 801</h3>
+									<p>
+										berücksichtigt nicht nur den UV-Schutz im Neuzustand des Textils, sondern auch
+										den Einfluss von Dehnung, Nässe, Abrieb und anderen Einflüssen Fokus auf wie gut
+										ein Textilmaterial die Haut vor den schädlichen Auswirkungen der UV-Strahlung
+										schützen kann, wenn es im täglichen Gebrauch ist
+									</p>
+									<div class="flex-1">
+										<enhanced:img
+											src={CertUvStandard}
+											alt="UV-Standard 801"
+											class=" h-full max-h-44 w-full object-contain"
+										/>
+									</div>
+								</div>
+								<div class="flex flex-col items-start gap-2">
+									<div>
+										<h3 class="text-lg">FSC Recycled</h3>
+										<p>
+											berücksichtigt nicht nur den UV-Schutz im Neuzustand des Textils, sondern auch
+											den Einfluss von Dehnung, Nässe, Abrieb und anderen Einflüssen Fokus auf wie
+											gut ein Textilmaterial die Haut vor den schädlichen Auswirkungen der
+											UV-Strahlung schützen kann, wenn es im täglichen Gebrauch ist
+										</p>
+									</div>
+									<div class="flex-1">
+										<enhanced:img
+											src={CertRecycled}
+											alt="FSC Recycled"
+											class="h-full max-h-44 w-full object-contain"
+										/>
+									</div>
+								</div>
+							</div>
 						</div>
 					</Accordion>
 				</div>
