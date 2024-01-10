@@ -1,30 +1,30 @@
-import { medusa_sveltekit_client } from '$lib/server/medusa';
-import { redirect, type Handle } from '@sveltejs/kit';
+import { get_customer_cart, get_customer_session } from '$lib/server/hook.utils';
+import { redirect, type Handle, type RequestEvent } from '@sveltejs/kit';
 
 const REDIRECT_TEMPORARY = 307;
 
-// const handle_medusa_request = async (event: RequestEvent) => {
-// 	event.locals.sid = event.cookies.get('sid') || '';
+const handle_medusa_request = async (event: RequestEvent) => {
+	event.locals.sid = event.cookies.get('sid') || '';
 
-// 	if (event.locals.sid) {
-// 		const customer = await get_customer_session(event, `connect.sid=${event.locals.sid}`);
+	if (event.locals.sid) {
+		const customer = await get_customer_session(event, `connect.sid=${event.locals.sid}`);
 
-// 		if (!customer) {
-// 			event.locals.sid = '';
-// 		} else {
-// 			event.locals.user = customer;
-// 		}
-// 	}
+		if (!customer) {
+			event.locals.sid = '';
+		} else {
+			event.locals.user = customer;
+		}
+	}
 
-// 	event.cookies.set('sid', event.locals.sid, { path: '/' });
+	event.cookies.set('sid', event.locals.sid, { path: '/' });
 
-// 	event.locals.cartid = event.cookies.get('cartid') || '';
-// 	const cart = await get_customer_cart(event, `connect.sid=${event.locals.sid}`);
-// 	event.locals.cartid = cart?.id || '';
-// 	event.locals.cart = cart || undefined;
+	event.locals.cartid = event.cookies.get('cartid') || '';
+	const cart = await get_customer_cart(event, `connect.sid=${event.locals.sid}`);
+	event.locals.cartid = cart?.id || '';
+	event.locals.cart = cart || undefined;
 
-// 	return event;
-// };
+	return event;
+};
 
 const PUBLIC_ROUTES = [
 	'/access',
@@ -54,7 +54,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			redirect(REDIRECT_TEMPORARY, '/access');
 		}
 
-		event = await medusa_sveltekit_client.handleRequest(event);
+		event = await handle_medusa_request(event);
 
 		return await resolve(event);
 	}
