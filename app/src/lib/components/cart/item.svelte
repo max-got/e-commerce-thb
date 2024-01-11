@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { SubmitFunction } from '@sveltejs/kit';
-	import type { Cart } from '@medusajs/medusa';
+	import type { LineItem } from '@medusajs/medusa/dist/models/line-item';
 	import { loading } from '$lib/stores/loading';
 	import { toast } from 'svelte-sonner';
 	import { enhance } from '$app/forms';
@@ -14,7 +14,7 @@
 	import type { StyleContext } from './wrapper.svelte';
 	import { invalidateAll } from '$app/navigation';
 
-	export let item: Cart['items'][0];
+	export let item: LineItem;
 
 	let style = getContext<StyleContext>('style');
 
@@ -75,7 +75,11 @@
 		<div
 			class="cb from-accent via-accent-300/60 to-accent col-span-3 block h-px w-full bg-gradient-to-r"
 		></div>
-		<img src={item.thumbnail} alt="" class="h-16 w-16 rounded object-cover [grid-area:image]" />
+		<img
+			src={item.variant?.thumbnail ? item.variant?.thumbnail : item.thumbnail}
+			alt=""
+			class="h-16 w-16 rounded object-cover [grid-area:image]"
+		/>
 		<div class="xs:ml-0 ml-auto self-start [grid-area:title;]">
 			<h3 class="text-base font-bold leading-none">{item.title}</h3>
 			{#if item.variant.product.subtitle}
