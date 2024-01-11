@@ -114,10 +114,6 @@
 		};
 	};
 
-	$: price = $selected_variant?.original_price_incl_tax
-		? format_price($selected_variant?.original_price_incl_tax)
-		: '';
-
 	onMount(() => {
 		if ($query_parameters.variant) {
 			selected_variant_id.set(
@@ -159,7 +155,8 @@
 						<span class="bg-accent mx-4 h-px flex-1"></span>
 						<div class="flex flex-col items-center">
 							<p class="font-display text-accent text-2xl font-extrabold tabular-nums">
-								{price}
+								{$selected_variant.original_price_incl_tax &&
+									format_price($selected_variant.original_price_incl_tax)}
 							</p>
 							<span class="text-accent-400 text-sm font-light tracking-normal">inkl. MwSt.</span>
 						</div>
