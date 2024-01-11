@@ -35,12 +35,6 @@
 </script>
 
 <div>
-	{#if product.metadata?.herstellungsmaterialien}
-		<p class="prose">
-			<!--eslint-disable-next-line svelte/no-at-html-tags-->
-			{@html product.metadata?.herstellungsmaterialien}
-		</p>
-	{/if}
 	{#each STATS_TO_SHOW as stat}
 		{#if product.metadata?.[stat.key] && filter_null_undefined_empty(product.metadata?.[stat.key])}
 			<div
