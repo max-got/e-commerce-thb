@@ -37,13 +37,15 @@ const plugins = [
 		},
 	},
 	{
-		resolve: `medusa-file-supabase`,
+		resolve: `medusa-file-cloudinary`,
 		options: {
-			project_ref: process.env.SUPABASE_PROJECT_REF,
-			service_key: process.env.SUPABASE_SERVICE_KEY,
-			bucket_name: process.env.SUPABASE_IMAGE_BUCKET_NAME,
+			cloud_name: process.env.CLOUDINARY_API_CLOUD_NAME,
+			api_key: process.env.CLOUDINARY_API_KEY,
+			api_secret: process.env.CLOUDINARY_API_SECRET,
+			secure: true,
 		},
 	},
+
 	{
 		resolve: 'medusa-plugin-variant-images',
 		options: {
@@ -67,10 +69,22 @@ const modules =
 						redisUrl: process.env.REDIS_URL,
 					},
 				},
+				stockLocationService: {
+					resolve: '@medusajs/stock-location',
+				},
+				inventoryService: {
+					resolve: '@medusajs/inventory',
+				},
 		  }
 		: {
 				eventBus: {
 					resolve: '@medusajs/event-bus-local',
+				},
+				stockLocationService: {
+					resolve: '@medusajs/stock-location',
+				},
+				inventoryService: {
+					resolve: '@medusajs/inventory',
 				},
 		  };
 
@@ -79,7 +93,7 @@ const projectConfig = {
 	jwtSecret: process.env.JWT_SECRET,
 	cookieSecret: process.env.COOKIE_SECRET,
 	store_cors: process.env.STORE_CORS,
-	database_url: process.env.SUPABASE_DATABASE_URL,
+	database_url: process.env.RAILWAY_DATABASE_URL,
 	admin_cors: process.env.ADMIN_CORS,
 	// Uncomment the following lines to enable REDIS
 	redis_url: process.env.NODE_ENV === 'production' ? process.env.REDIS_URL : undefined,
