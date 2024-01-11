@@ -67,12 +67,12 @@
 						</a>
 					{/if}
 					{#if $page.url.pathname !== '/s/cart' && $page.url.pathname !== '/s/checkout'}
-						<button on:click={() => ($sidebar_cart_open = true)} class="text-white">
+						<button on:click={() => ($sidebar_cart_open = true)} class="relative text-white">
 							<span class="sr-only">Warenkorb öffnen</span>
 							<Basket class="text-xl text-white" />
 							{#if cart}
 								<span
-									class="bg-primary font-body elevation-2 absolute right-[.8em] top-[.1em] flex h-[0.8em] w-[0.8em] items-center justify-center rounded-full p-[.65em] text-[0.75em] tabular-nums text-white"
+									class="bg-primary font-body elevation-2 absolute -right-[.8em] -top-[.6em] flex h-[0.8em] w-[0.8em] items-center justify-center rounded-full p-[.65em] text-[0.75em] tabular-nums text-white"
 								>
 									{number_of_items}
 								</span>
@@ -87,7 +87,9 @@
 
 {#if is_homepage}
 	<div class="bg-accent text-primary block py-px">
-		<div class="whitespace-no-wrap max-w-layout relative mx-auto flex items-center overflow-x-hidden">
+		<div
+			class="whitespace-no-wrap max-w-layout relative mx-auto flex items-center overflow-x-hidden"
+		>
 			<div class="marquee whitespace-nowrap">
 				<!--eslint-disable-next-line @typescript-eslint/no-unused-vars --->
 				{#each { length: 18 } as _, i}
