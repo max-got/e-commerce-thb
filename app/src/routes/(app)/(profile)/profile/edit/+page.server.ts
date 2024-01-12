@@ -4,37 +4,36 @@ import { redirect } from '@sveltejs/kit';
 import { message, superValidate } from 'sveltekit-superforms/server';
 import type { Actions, PageServerLoad } from './$types';
 
+const get_user = async (sid: string) => {
+	try {
+		const user = await medusa_client.customers.retrieve({
+			Cookie: `connect.sid=${sid}`
+		});
+
+		if (!user) redirect(302, '/auth/login');
+
+		return user.customer;
+	} catch (error) {
+		console.error('Error getting customer session:', error);
+		redirect(302, '/auth/login');
+	}
+};
+
+const get_orders = async (sid: string) => {
+	try {
+		const orders = await medusa_client.customers.listOrders(undefined, {
+			Cookie: `connect.sid=${sid}`
+		});
+
+		return orders.orders;
+	} catch (error) {
+		console.error('Error getting customer orders:', error);
+		return [];
+	}
+};
 export const load = (async ({ locals }) => {
-	const get_user = async () => {
-		try {
-			const user = await medusa_client.customers.retrieve({
-				Cookie: `connect.sid=${locals.sid}`
-			});
-
-			if (!user) redirect(302, '/auth/login');
-
-			return user.customer;
-		} catch (error) {
-			console.error('Error getting customer session:', error);
-			redirect(302, '/auth/login');
-		}
-	};
-
-	const get_orders = async () => {
-		try {
-			const orders = await medusa_client.customers.listOrders(undefined, {
-				Cookie: `connect.sid=${locals.sid}`
-			});
-
-			return orders.orders;
-		} catch (error) {
-			console.error('Error getting customer orders:', error);
-			return [];
-		}
-	};
-
 	//settle promises in parallel
-	const [user, orders] = await Promise.all([get_user(), get_orders()]);
+	const [user, orders] = await Promise.all([get_user(locals.sid), get_orders(locals.sid)]);
 
 	const edit_profile = await superValidate(
 		{
@@ -48,7 +47,10 @@ export const load = (async ({ locals }) => {
 			province: user.shipping_addresses?.[0]?.province || '',
 			company: user.shipping_addresses?.[0]?.company || ''
 		},
-		customer_informations_zod
+		customer_informations_zod,
+		{
+			errors: false
+		}
 	);
 
 	return {

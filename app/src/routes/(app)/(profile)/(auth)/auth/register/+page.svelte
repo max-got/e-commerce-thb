@@ -9,11 +9,9 @@
 
 	export let data: PageData;
 
-	const { form, errors, message, enhance } = superForm(data.loginForm, {
+	const { form, errors, message, enhance } = superForm(data.registerForm, {
 		validators: register_post_request,
-		invalidateAll: true,
-
-		taintedMessage: null
+		invalidateAll: true
 	});
 
 	$form.rurl = data.rurl || '';
@@ -35,7 +33,7 @@
 			bind:value={$form.first_name}
 			class="mt-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm"
 		/>
-		{#if $errors.first_name}<span class="invalid">{$errors.first_name}</span>{/if}
+		{#if $errors.first_name}<span class="invalid text-accent">{$errors.first_name}</span>{/if}
 	</div>
 	<div class="col-span-6 lg:col-span-3">
 		<label for="last_name" class="block text-sm font-medium text-gray-700">Nachname</label>
@@ -77,7 +75,6 @@
 			class="mt-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm"
 		/>
 		{#if $errors.password}<span class="invalid">{$errors.password}</span>{/if}
-		{#if $message}<div class="mt-2 text-sm text-red-600">{$message}</div>{/if}
 	</div>
 	<div class="col-span-6">
 		<label for="password_confirm" class="block text-sm font-medium text-gray-700">
@@ -93,7 +90,7 @@
 			aria-invalid={$form.password_confirm ? 'true' : undefined}
 			bind:value={$form.password_confirm}
 		/>
-		{#if $form.password_confirm}<span class="invalid">{$form.password_confirm}</span>{/if}
+		{#if $errors.password_confirm}<span class="invalid">{$errors.password_confirm}</span>{/if}
 	</div>
 
 	<div class="col-span-6">
@@ -131,4 +128,9 @@
 			<a href="/auth/login" class="text-gray-700 underline">Login</a>.
 		</p>
 	</div>
+	{#if $message}
+		<div class="col-span-6">
+			<p class="invalid text-sm text-red-600">{$message}</p>
+		</div>
+	{/if}
 </form>

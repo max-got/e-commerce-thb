@@ -13,18 +13,18 @@ export const load = (async ({ locals, url }) => {
 		redirect(302, `/${rurl}`);
 	}
 
-	const loginForm = await superValidate(register_post_request, { id: 'login' });
+	const registerForm = await superValidate(register_post_request);
 
 	return {
 		rurl,
 		code,
-		loginForm
+		registerForm
 	};
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {
 	register: async ({ request, locals, cookies }) => {
-		const form = await superValidate(request, register_post_request, { id: 'register' });
+		const form = await superValidate(request, register_post_request);
 		if (!form.valid) return message(form, 'Something went wrong', { status: 500 }); // this shouldn't happen because of client-side validation
 
 		const user = {
@@ -39,7 +39,13 @@ export const actions: Actions = {
 			redirect(302, `/${form.data.rurl}`);
 		} else {
 			console.log('not registered');
-			return message(form, 'Unable to register a new user with that email address', { status: 400 });
+			return message(
+				form,
+				'Wir können dir mit dieser E-Mail Addresse kein Konto erstellen. Bitte versuche es später erneut.',
+				{
+					status: 403
+				}
+			);
 		}
 	}
 };

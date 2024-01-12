@@ -2,11 +2,14 @@
 	import type { LayoutData } from './$types';
 
 	export let data: LayoutData;
+	import './style.pcss';
 </script>
 
 <section class="max-w-layout relative mx-auto">
 	<div class="h-full lg:grid lg:grid-cols-12">
-		<aside class="bg-accent relative block h-32 lg:order-last lg:col-span-5 lg:h-full xl:col-span-6">
+		<aside
+			class="bg-accent relative block h-32 lg:order-last lg:col-span-5 lg:h-full xl:col-span-6"
+		>
 			<enhanced:img
 				src={data.backdrop}
 				alt=""
