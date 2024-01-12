@@ -1,4 +1,4 @@
-import type { Cart, Customer } from '@medusajs/medusa';
+import type { Customer, StoreCartsRes } from '@medusajs/medusa';
 
 import 'unplugin-icons/types/svelte';
 declare global {
@@ -11,7 +11,7 @@ declare global {
 			sid: string;
 			cartid: string;
 			user: Customer | null;
-			cart?: Omit<Cart, 'refundable_amount' | 'refunded_total'>;
+			cart?: StoreCartsRes['cart'];
 			student?: {
 				name: string;
 			};
