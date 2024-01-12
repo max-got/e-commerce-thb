@@ -13,31 +13,46 @@
 	import { getContext } from 'svelte';
 	import type { StyleContext } from './wrapper.svelte';
 	import { invalidateAll } from '$app/navigation';
+	import { get_cart_count } from '$lib/stores/cart_count';
 
 	export let item: LineItem;
 
 	let style = getContext<StyleContext>('style');
 
 	let form: HTMLFormElement;
-
-	const remove_item: SubmitFunction = async () => {
+	const cart_count = get_cart_count();
+	const remove_item: SubmitFunction = async ({ formData }) => {
 		$loading = true;
+		const form_quantity = formData.get('quantity') as string;
+		cart_count.set($cart_count - parseInt(form_quantity));
 
 		return async ({ result, update }) => {
-			if (result.type === 'success') {
-				toast.message('Erfolgreich aktualisiert', {
-					descriptionClass: '!text-xs',
-					invert: true
-				});
+			switch (result.type) {
+				case 'success':
+					toast.success('Erfolgreich aktualisiert', {
+						description: `Du hast ${form_quantity} x ${item.title}(${item.variant.title}) entfernt`
+					});
+					break;
+
+				default:
+					cart_count.set($cart_count + parseInt(form_quantity));
+					break;
 			}
 
 			$loading = false;
-			await update();
+			await update({ reset: false });
 		};
 	};
 
-	const update_item: SubmitFunction = async () => {
+	const update_item: SubmitFunction = async ({ formData }) => {
 		$loading = true;
+		const form_quantity = formData.get('quantity') as string;
+		const item_quantity = item.quantity;
+		if (parseInt(form_quantity) < item_quantity) {
+			cart_count.set($cart_count - (item_quantity - parseInt(form_quantity)));
+		} else {
+			cart_count.set($cart_count + (parseInt(form_quantity) - item_quantity));
+		}
 
 		return async ({ result, update }) => {
 			switch (result.type) {
@@ -60,6 +75,12 @@
 							invert: true
 						});
 					}
+					if (parseInt(form_quantity) < item_quantity) {
+						cart_count.set($cart_count + (item_quantity - parseInt(form_quantity)));
+					} else {
+						cart_count.set($cart_count - (parseInt(form_quantity) - item_quantity));
+					}
+
 					break;
 			}
 
@@ -75,11 +96,16 @@
 		<div
 			class="cb from-accent via-accent-300/60 to-accent col-span-3 block h-px w-full bg-gradient-to-r"
 		></div>
-		<img
-			src={item.variant?.thumbnail ? item.variant?.thumbnail : item.thumbnail}
-			alt=""
-			class="h-16 w-16 rounded object-cover [grid-area:image]"
-		/>
+		<div class="m-auto self-center [grid-area:image]">
+			<img
+				src={item.variant?.thumbnail ? item.variant?.thumbnail : item.thumbnail}
+				alt=""
+				class="max-w-32 rounded object-cover"
+				loading="eager"
+				height="128"
+				width="128"
+			/>
+		</div>
 		<div class="xs:ml-0 ml-auto self-start [grid-area:title;]">
 			<h3 class="text-base font-bold leading-none">{item.title}</h3>
 			{#if item.variant.product.subtitle}
@@ -107,11 +133,11 @@
 				<select
 					name="quantity"
 					id="quantity"
-					class="focus:ring-primary-400 focus:ring-offset-primary-400 w-auto rounded-md px-5 py-1 text-sm bg-blend-luminosity focus:outline-none focus:ring-1 focus:ring-offset-1"
+					class="focus:ring-primary-400 focus:ring-offset-primary-400 bg-accent w-auto rounded-md px-5 py-1 text-sm text-white bg-blend-luminosity focus:outline-none focus:ring-1 focus:ring-offset-1"
 					on:change={() => form.requestSubmit()}
 					disabled={$loading ? true : undefined}
 				>
-					{#each [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as number}
+					{#each [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as number}
 						<option value={number} selected={item.quantity === number}>{number}</option>
 					{/each}
 				</select>
@@ -121,7 +147,7 @@
 			</form>
 		{/if}
 		{#if item.total}
-			<p class="flex gap-2 text-right text-xs [grid-area:price;]">
+			<p class="flex gap-2 justify-self-end text-right text-xs [grid-area:price;]">
 				<span>Preis:</span>
 				{format_price(item.total)}
 			</p>
@@ -133,15 +159,19 @@
 		</p>
 		{#if $style !== 'checkout'}
 			<form
-				class="justify-self-end [grid-area:delete;]"
+				class="w-full [grid-area:delete;]"
 				method="POST"
 				action="/s/cart?/remove"
 				use:enhance={remove_item}
 			>
-				<Button class="px-1 py-1" colorway={'accent'} size="xsmall" icon={TrashCan} type="submit"
-					>Entfernen</Button
+				<Button
+					class="w-full px-1 py-1"
+					colorway={'accent'}
+					size="xsmall"
+					icon={TrashCan}
+					type="submit">Entfernen</Button
 				>
-
+				<input type="hidden" name="quantity" bind:value={item.quantity} />
 				<input type="hidden" name="item_id" value={item.id} />
 			</form>
 		{/if}

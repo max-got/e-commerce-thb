@@ -5,7 +5,7 @@
 	import Gallery from './Gallery.svelte';
 	import { toast } from 'svelte-sonner';
 	import { onMount } from 'svelte';
-	import { queryParam, queryParameters } from 'sveltekit-search-params';
+	import { queryParam } from 'sveltekit-search-params';
 	import { goto } from '$app/navigation';
 	import { loading } from '$lib/stores/loading';
 	import Button from '$lib/components/primitives/Button.svelte';
@@ -19,111 +19,91 @@
 	import Accordion from './_components/Accordion.svelte';
 	import Details from './_components/utils/Details.svelte';
 	import Attributes from './_components/utils/Attributes.svelte';
+	import { get_cart_count } from '$lib/stores/cart_count';
 
 	export let data: PageData;
 
-	$: query_parameters = queryParameters<{ variant: string | null }>();
-
-	$: variant_query_param = queryParam('variant', {
-		encode: (value: string) => value,
-		decode: (value: string | null) => (value ? value.toString() : null),
-		defaultValue: data.product.variants[0].title?.toLowerCase() || ''
+	const variant_qp = queryParam('variant', {
+		encode: (value) => value.toLowerCase(),
+		decode: (value) => value,
+		defaultValue: data.product.variants[0].title || ''
 	});
 
-	$: selected_variant_id = writable<string>(data.product.variants[0].id || '');
-	$: selected_variant = derived(selected_variant_id, ($selected_variant_id) => {
+	const selected_variant_id = writable<string>(data?.product.variants[0].id || '');
+	const selected_variant = derived(selected_variant_id, ($selected_variant_id) => {
 		return (
 			data.product.variants.find((variant) => variant.id === $selected_variant_id) ||
 			data.product.variants[0]
 		);
 	});
 
-	$: selected_variant.subscribe(($selected_variant) => {
-		if ($selected_variant) {
-			variant_query_param.set($selected_variant.title?.toLowerCase() || '');
-		}
-	});
-
-	$: inventory_status = derived(selected_variant, ($selected_variant) =>
+	const inventory_status = derived(selected_variant, ($selected_variant) =>
 		inventory_status_store($selected_variant)
 	);
 
+	const current_cart_count = get_cart_count();
+	const add_to_cart_helpers = {
+		increment: () => {
+			current_cart_count.update((count) => count + 1);
+		},
+		decrement: () => {
+			current_cart_count.update((count) => count - 1);
+		}
+	};
+
 	const add_to_cart: SubmitFunction = async () => {
 		$loading = true;
-
-		//!TODO: optimistic update
-		//const variantId = formData.get('variantId');
-		//const variant = data.product.variants.find((variant) => variant.id === variantId);
+		add_to_cart_helpers.increment();
 
 		return async ({ result, update }) => {
+			let error_message: string = `${data.product.title} konnte nicht zum Warenkorb hinzugefügt werden`;
 			switch (result.type) {
 				case 'success':
-					toast.success(`${data.product.title}`, {
-						description: ' wurde zum Warenkorb hinzugefügt',
-						descriptionClass: '!text-[.6rem]',
-						style: 'font-size:.8rem;',
-						cancelButtonStyle: 'background:none !important; color:red;',
+					toast.success('Erfolgreich aktualisiert', {
+						description: `${data.product.title} (${$selected_variant.title}) wurde zum Warenkorb hinzugefügt`,
 						action: {
 							label: 'Zum Warenkorb',
 							onClick: async () => {
 								await goto('/s/cart');
 							}
 						},
-
-						actionButtonStyle: 'background:none !important; color:red;'
+						class: /*tw*/ '!w-max !gap-6',
+						position: 'bottom-center'
 					});
 					break;
 
 				case 'error':
+					error_message = result?.error?.message;
 					toast.error(`${data.product.title}`, {
-						description: ' konnte nicht zum Warenkorb hinzugefügt werden',
-						descriptionClass: '!text-[.6rem]',
-						style: 'font-size:.8rem;',
-						cancelButtonStyle: 'background:none !important; color:red;',
-						action: {
-							label: 'Schließen',
-							onClick: (e) => {
-								toast.dismiss(e.detail);
-							}
-						},
-
-						actionButtonStyle: 'background:none !important; color:red;'
+						description: ` ${result.error} konnte nicht zum Warenkorb hinzugefügt werden`
 					});
+					add_to_cart_helpers.decrement();
 					break;
 
 				case 'failure':
-					toast.error(`${data.product.title}`, {
-						description: ' konnte nicht zum Warenkorb hinzugefügt werden',
-						descriptionClass: '!text-[.6rem]',
-						style: 'font-size:.8rem;',
-						cancelButtonStyle: 'background:none !important; color:red;',
-						action: {
-							label: 'Schließen',
-							onClick: (e) => {
-								toast.dismiss(e.detail);
-							}
-						},
-
-						actionButtonStyle: 'background:none !important; color:red;'
+					error_message = result?.data?.message;
+					toast.error('Fehler', {
+						description: error_message
 					});
+					add_to_cart_helpers.decrement();
 					break;
 			}
 
 			$loading = false;
-			update();
+			update({ reset: false });
 		};
 	};
 
 	onMount(() => {
-		if ($query_parameters.variant) {
-			selected_variant_id.set(
-				data.product.variants.find(
-					(variant) => variant.title?.toLowerCase() === $query_parameters.variant
-				)?.id ||
-					data.product.variants[0].id ||
-					''
-			);
-		}
+		// if ($query_parameters.variant) {
+		// 	selected_variant_id.set(
+		// 		data.product.variants.find(
+		// 			(variant) => variant.title?.toLowerCase() === $query_parameters.variant
+		// 		)?.id ||
+		// 			data.product.variants[0].id ||
+		// 			''
+		// 	);
+		// }
 	});
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -152,7 +132,7 @@
 								{$selected_variant?.title}
 							</span>
 						</h1>
-						<span class="bg-accent mx-4 h-px flex-1"></span>
+						<span class="bg-accent mx-4 h-px flex-1"> </span>
 						<div class="flex flex-col items-center">
 							<p class="font-display text-accent text-2xl font-extrabold tabular-nums">
 								{$selected_variant.original_price_incl_tax &&
@@ -160,9 +140,6 @@
 							</p>
 							<span class="text-accent-400 text-sm font-light tracking-normal">inkl. MwSt.</span>
 						</div>
-						<p class="{$inventory_status.class_name()} hidden text-center">
-							{$inventory_status.text()}
-						</p>
 					</div>
 				</div>
 			</div>
@@ -182,6 +159,9 @@
 										name="product_variant"
 										value={variant.id}
 										bind:group={$selected_variant_id}
+										on:input={() => {
+											$variant_qp = variant.title?.toLowerCase() || '';
+										}}
 										checked={$selected_variant_id === variant.id}
 										class="peer hidden"
 										required
@@ -214,6 +194,9 @@
 							<h3 class="mb-1 text-base font-normal">
 								Variante: <span class="font-semibold">{$selected_variant.title}</span>
 							</h3>
+							<p class="{$inventory_status.class_name()}  text-center">
+								{$inventory_status.text()}
+							</p>
 							<h3 class="mb-1 text-base font-normal">
 								Preis:
 								<span class="font-semibold"

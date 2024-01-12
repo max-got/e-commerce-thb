@@ -37,11 +37,12 @@ const get_other_products = async ({ handle }: { handle: string }) => {
 	}
 };
 
-export const load = (async ({ params }) => {
+export const load = (async ({ params, url, untrack }) => {
 	const { product_handle } = params;
+	untrack(() => url.searchParams.has('variant'));
 
 	return {
-		other_products: get_other_products({ handle: product_handle }),
-		product: await get_product({ handle: product_handle })
+		product: await get_product({ handle: product_handle }),
+		other_products: get_other_products({ handle: product_handle })
 	};
 }) satisfies PageServerLoad;

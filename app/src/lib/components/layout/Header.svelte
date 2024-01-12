@@ -5,19 +5,16 @@
 
 	import Basket from '~icons/ph/shopping-cart';
 	import { sidebar_cart_open } from '$lib/components/cart';
-	import type { Cart, Customer } from '@medusajs/medusa';
+	import type { Customer } from '@medusajs/medusa';
+	import { get_cart_count } from '$lib/stores/cart_count';
+	import type { StoreCartsRes } from '@medusajs/medusa';
 
-	export let cart: Cart | undefined = undefined;
+	export let cart: StoreCartsRes['cart'] | undefined = undefined;
 	export let user: Customer | undefined = undefined;
 
 	$: is_homepage = $page.route.id === '/';
 
-	let number_of_items: number | string | undefined;
-	$: if (cart)
-		number_of_items =
-			cart.items.map((item) => item.quantity).reduce((a, b) => a + b, 0) > 9
-				? '9+'
-				: cart.items.map((item) => item.quantity).reduce((a, b) => a + b, 0);
+	const number_of_items = get_cart_count();
 </script>
 
 <header class="bg-accent border-primary relative z-10 border-b shadow-md">
@@ -74,7 +71,7 @@
 								<span
 									class="bg-primary font-body elevation-2 absolute -right-[.8em] -top-[.6em] flex h-[0.8em] w-[0.8em] items-center justify-center rounded-full p-[.65em] text-[0.75em] tabular-nums text-white"
 								>
-									{number_of_items}
+									{$number_of_items > 9 ? '9+' : Math.max($number_of_items, 0)}
 								</span>
 							{/if}
 						</button>
