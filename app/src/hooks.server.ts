@@ -11,6 +11,7 @@ const handle_medusa_request = async (event: RequestEvent) => {
 
 		if (!customer) {
 			event.locals.sid = '';
+			event.locals.user = null;
 		} else {
 			event.locals.user = customer;
 		}
