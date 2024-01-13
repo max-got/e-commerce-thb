@@ -46,7 +46,9 @@
 		// SVG
 		/*tw*/ '[&_svg:not([class])]:w-[1.45em] [&_svg:not([class])]:h-[1.45em]',
 		// Aria Busy styling
-		/*tw*/ 'aria-busy:opacity-60 aria-busy:cursor-wait aria-busy:hover:text-[inherit]'
+		/*tw*/ 'aria-busy:opacity-60 aria-busy:cursor-wait aria-busy:hover:text-[inherit]',
+		// Disabled styling
+		/*tw*/ 'disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:text-[inherit] aria-disabled:opacity-60 aria-disabled:cursor-not-allowed aria-disabled:hover:text-[inherit]'
 	];
 
 	const colors: Record<typeof colorway, string> = {

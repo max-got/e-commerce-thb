@@ -1,5 +1,4 @@
 import type { PricedVariant } from '@medusajs/medusa/dist/types/pricing.d';
-import { writable } from 'svelte/store';
 
 const INVENTORY_STATUS = {
 	IN_STOCK: 'in_stock',
@@ -10,69 +9,79 @@ const INVENTORY_STATUS = {
 export type INVENTORY_STATUS = (typeof INVENTORY_STATUS)[keyof typeof INVENTORY_STATUS];
 
 function inventory_status(priced_product?: PricedVariant) {
-	const { set, update, subscribe } = writable<PricedVariant>();
+	const _quantity = priced_product?.inventory_quantity || 0;
 
-	const quantity = priced_product?.inventory_quantity || 0;
+	const _inventory_status = () => {
+		let inventory_status: { quantity: number; status: INVENTORY_STATUS } = {
+			quantity: 0,
+			status: INVENTORY_STATUS.OUT_OF_STOCK
+		};
 
-	const inventory_status = (): { quantity: number; status: INVENTORY_STATUS } => {
-		if (quantity !== undefined) {
-			if (quantity > 0 && quantity < 10) {
-				return {
-					quantity,
+		if (_quantity !== undefined) {
+			if (_quantity > 0 && _quantity < 10) {
+				inventory_status = {
+					quantity: _quantity,
 					status: INVENTORY_STATUS.LOW_STOCK
 				};
-			} else if (quantity >= 10) {
-				return {
-					quantity,
+			} else if (_quantity >= 10) {
+				inventory_status = {
+					quantity: _quantity,
 					status: INVENTORY_STATUS.IN_STOCK
 				};
-			} else if (quantity === 0) {
-				return {
-					quantity,
+			} else if (_quantity === 0) {
+				inventory_status = {
+					quantity: _quantity,
+					status: INVENTORY_STATUS.OUT_OF_STOCK
+				};
+			} else {
+				inventory_status = {
+					quantity: _quantity,
 					status: INVENTORY_STATUS.OUT_OF_STOCK
 				};
 			}
 		}
 
-		return {
-			quantity: 0,
-			status: INVENTORY_STATUS.OUT_OF_STOCK
-		};
+		return inventory_status;
 	};
+	const { status, quantity } = _inventory_status();
 
-	const text = () => {
-		const quantity = inventory_status().status;
-
-		switch (quantity) {
+	const _display_text = () => {
+		switch (status) {
 			case 'in_stock':
 				return 'Auf Lager';
 			case 'low_stock':
-				return `Noch ${inventory_status().quantity} Stück verfügbar`;
+				return `Noch ${quantity} Stück verfügbar`;
 			case 'out_of_stock':
+				return 'Ausverkauft';
+			default:
 				return 'Ausverkauft';
 		}
 	};
 
-	const class_name = () => {
-		const quantity = inventory_status().status;
+	const display_text = _display_text();
 
-		switch (quantity) {
+	const _class_name = () => {
+		switch (status) {
 			case 'in_stock':
 				return 'text-green-500';
 			case 'low_stock':
 				return 'text-yellow-500';
 			case 'out_of_stock':
 				return 'text-red-500';
+			default:
+				return 'text-red-500';
 		}
 	};
+	const class_name = _class_name();
 
 	return {
-		subscribe,
-		inventory_status,
-		text,
+		display_text,
 		class_name,
-		set,
-		update
+		is_available: status === 'in_stock' || status === 'low_stock',
+		is_low_stock: status === 'low_stock',
+		is_out_of_stock: status === 'out_of_stock',
+		quantity: quantity,
+		status: status
 	};
 }
 

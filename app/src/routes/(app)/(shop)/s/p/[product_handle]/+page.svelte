@@ -4,13 +4,13 @@
 	import type { PageData } from './$types';
 	import Gallery from './Gallery.svelte';
 	import { toast } from 'svelte-sonner';
-	import { onMount } from 'svelte';
+
 	import { queryParam } from 'sveltekit-search-params';
 	import { goto } from '$app/navigation';
 	import { loading } from '$lib/stores/loading';
 	import Button from '$lib/components/primitives/Button.svelte';
 	import { format_price } from '$lib/utils/shop';
-	import { derived, writable } from 'svelte/store';
+	import { derived, writable, type Writable } from 'svelte/store';
 	import { inventory_status_store } from './utils';
 
 	import CertUvStandard from '$lib/assets/certificates/uv_standard_801.jpg?enhanced';
@@ -25,20 +25,34 @@
 
 	const variant_qp = queryParam('variant', {
 		encode: (value) => value.toLowerCase(),
-		decode: (value) => value,
-		defaultValue: data.product.variants[0].title || ''
+		decode: (value) => value
 	});
 
-	const selected_variant_id = writable<string>(data?.product.variants[0].id || '');
-	const selected_variant = derived(selected_variant_id, ($selected_variant_id) => {
-		return (
-			data.product.variants.find((variant) => variant.id === $selected_variant_id) ||
-			data.product.variants[0]
+	function find_variant_by_id(id: string) {
+		return data.product.variants.find((variant) => variant.id === id);
+	}
+
+	function find_variant_by_title(title: string) {
+		return data.product.variants.find(
+			(variant) => variant.title?.toLowerCase() === title.toLowerCase()
 		);
-	});
+	}
 
-	const inventory_status = derived(selected_variant, ($selected_variant) =>
-		inventory_status_store($selected_variant)
+	let selected_product_id: Writable<string>;
+	$: selected_product_id = writable(
+		$variant_qp ? find_variant_by_title($variant_qp)?.id : data.product.variants[0].id
+	);
+
+	$: selected_product_variant = derived(
+		selected_product_id,
+		($selected_product_id) => {
+			return find_variant_by_id($selected_product_id) || data.product.variants[0];
+		},
+		data.product.variants[0]
+	);
+
+	$: inventory_status = derived(selected_product_variant, ($selected_product_variant) =>
+		inventory_status_store($selected_product_variant)
 	);
 
 	const current_cart_count = get_cart_count();
@@ -60,7 +74,7 @@
 			switch (result.type) {
 				case 'success':
 					toast.success('Erfolgreich aktualisiert', {
-						description: `${data.product.title} (${$selected_variant.title}) wurde zum Warenkorb hinzugefügt`,
+						description: `${data.product.title} (${$selected_product_variant.title}) wurde zum Warenkorb hinzugefügt`,
 						action: {
 							label: 'Zum Warenkorb',
 							onClick: async () => {
@@ -94,28 +108,19 @@
 		};
 	};
 
-	onMount(() => {
-		// if ($query_parameters.variant) {
-		// 	selected_variant_id.set(
-		// 		data.product.variants.find(
-		// 			(variant) => variant.title?.toLowerCase() === $query_parameters.variant
-		// 		)?.id ||
-		// 			data.product.variants[0].id ||
-		// 			''
-		// 	);
-		// }
-	});
-
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const notypecheck = (x: any) => x;
 </script>
 
 <section>
+	<div class="mx-auto w-full max-w-screen-2xl">
+		<div class="bg-accent grid w-full place-items-center">
+			{#key data.product}
+				<Gallery product={data.product} />
+			{/key}
+		</div>
+	</div>
 	<div class="max-w-layout mx-auto">
-		{#if data.product.images}
-			<Gallery images={data.product.images} />
-		{/if}
-
 		<div
 			class="mx-auto px-4 pb-16 pt-4 sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:grid-rows-[auto,auto,1fr] lg:gap-x-8 lg:px-8 lg:pb-24 lg:pt-8"
 		>
@@ -129,14 +134,14 @@
 							<span
 								class="text-secondary-600 text-center text-sm font-light tracking-normal md:text-start"
 							>
-								{$selected_variant?.title}
+								{$selected_product_variant?.title}
 							</span>
 						</h1>
 						<span class="bg-accent mx-4 h-px flex-1"> </span>
 						<div class="flex flex-col items-center">
 							<p class="font-display text-accent text-2xl font-extrabold tabular-nums">
-								{$selected_variant.original_price_incl_tax &&
-									format_price($selected_variant.original_price_incl_tax)}
+								{$selected_product_variant.original_price_incl_tax &&
+									format_price($selected_product_variant.original_price_incl_tax)}
 							</p>
 							<span class="text-accent-400 text-sm font-light tracking-normal">inkl. MwSt.</span>
 						</div>
@@ -146,7 +151,7 @@
 
 			<div class="relative lg:row-span-3 lg:mt-0">
 				<form class="sticky top-0" method="POST" action="/s/cart?/add" use:enhance={add_to_cart}>
-					<input type="hidden" name="variantId" value={$selected_variant_id} />
+					<input type="hidden" name="variantId" value={$selected_product_variant.id} />
 
 					<div>
 						<ul class="grid grid-flow-col-dense place-items-center justify-center gap-2">
@@ -154,15 +159,16 @@
 								{@const thumbnail = notypecheck(variant).thumbnail}
 								<li>
 									<input
+										checked={$selected_product_variant.id === variant.id}
 										type="radio"
 										id="product_variant_{variant.id}"
 										name="product_variant"
-										value={variant.id}
-										bind:group={$selected_variant_id}
-										on:input={() => {
-											$variant_qp = variant.title?.toLowerCase() || '';
+										bind:group={$selected_product_id}
+										on:change={() => {
+											//@ts-expect-error -  ja ist theoretisch so aber nicht in medusa :)
+											$variant_qp = variant.title;
 										}}
-										checked={$selected_variant_id === variant.id}
+										value={variant.id}
 										class="peer hidden"
 										required
 									/>
@@ -192,25 +198,34 @@
 					<div class="mt-4 flex flex-col gap-4">
 						<div class="flex items-center justify-between gap-2">
 							<h3 class="mb-1 text-base font-normal">
-								Variante: <span class="font-semibold">{$selected_variant.title}</span>
+								Variante: <span class="font-semibold">{$selected_product_variant.title}</span>
 							</h3>
-							<p class="{$inventory_status.class_name()}  text-center">
-								{$inventory_status.text()}
-							</p>
+
 							<h3 class="mb-1 text-base font-normal">
 								Preis:
 								<span class="font-semibold"
-									>{$selected_variant?.original_price_incl_tax
-										? format_price($selected_variant?.original_price_incl_tax)
+									>{$selected_product_variant?.original_price_incl_tax
+										? format_price($selected_product_variant?.original_price_incl_tax)
 										: ''}</span
 								>
 							</h3>
 						</div>
 
-						{#if $selected_variant_id}
+						<p class="{$inventory_status.class_name} text-center text-sm">
+							{$inventory_status.display_text}
+						</p>
+						{#if $inventory_status.is_available}
 							<Button type="submit" class=" w-full" colorway="accent">In den Warenkorb</Button>
 						{:else}
-							<p>Bitte wählen Sie eine Variante aus</p>
+							<Button type="submit" class=" w-full" colorway="white" disabled
+								>In den Warenkorb</Button
+							>
+							<p class="text-center">
+								<a href="#" class="text-accent mx-auto text-sm underline"
+									>Benachrichtige mich, wenn {data.product.title}
+									{$selected_product_variant.title} wieder verfügbar ist</a
+								>
+							</p>
 						{/if}
 					</div>
 				</form>
@@ -235,7 +250,7 @@
 						<span slot="head">Details</span>
 
 						<div slot="details" class="[&_p]:leading-relaxed">
-							<Details product={$selected_variant} />
+							<Details product={$selected_product_variant} />
 						</div>
 					</Accordion>
 
@@ -243,7 +258,7 @@
 						<span slot="head">Mehr zu diesem Produkt</span>
 
 						<div slot="details" class="[&_p]:leading-relaxed">
-							<Attributes product={$selected_variant} />
+							<Attributes product={$selected_product_variant} />
 						</div>
 					</Accordion>
 					<Accordion>
