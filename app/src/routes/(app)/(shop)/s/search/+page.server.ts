@@ -1,47 +1,66 @@
 import { medusa_client } from '$lib/server/medusa';
 import { fail } from '@sveltejs/kit';
+import z from 'zod';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async function ({ request }) {
-	const q = request.url.split('?')?.[1]?.split('=')[1];
-	const hits = q
-		? await medusa_client.products
-				.list({
-					q
-				})
-				.then(({ products }) => products)
-		: [];
+const search_post_request = z.object({
+	q: z.string().min(1)
+});
 
-	return {
-		hits
-	};
-};
+function parse_query(query: unknown) {
+	const parsed_q = search_post_request.safeParse({ q: query });
 
-export const actions: Actions = {
-	search: async ({ request }) => {
-		const data = await request.formData();
-		const q = data.get('q') as string;
-		if (!q) {
-			return fail(400, { q, missing: true });
-		}
-
-		try {
-			const hits = await medusa_client.products.list({
-				q
-			});
-
-			if (hits.count === 0) {
-				return fail(404, {
-					hits: null
-				});
-			}
-
-			return {
-				success: true,
-				hits: hits.products
-			};
-		} catch (error) {
-			return fail(500, { error });
-		}
+	if (!parsed_q.success) {
+		return false;
 	}
+	return parsed_q.data.q;
+}
+
+async function searchProducts(query: unknown) {
+	const parsed_q = parse_query(query);
+
+	if (!parsed_q) {
+		return { hits: [], success: false, error: false };
+	}
+
+	try {
+		const hits = await medusa_client.products
+			.list({
+				q: parsed_q
+			})
+			.then(({ products }) => products);
+		return { hits, success: true, error: false };
+	} catch (error: unknown) {
+		console.error(error); // Log the error for debugging
+		return { hits: [], success: false, error: true };
+	}
+}
+
+export const load: PageServerLoad = async function ({ url, isDataRequest }) {
+	const q = url.searchParams.get('q');
+	if (isDataRequest) {
+		return {
+			hits: []
+		};
+	}
+
+	return await searchProducts(q);
 };
+
+export const actions = {
+	default: async ({ request }) => {
+		const formData = await request.formData();
+		const q = formData.get('q');
+		console.log(q);
+
+		const hits = await searchProducts(q);
+
+		if (hits.success) {
+			return hits;
+		}
+
+		return hits.error
+			? fail(500, { error: 'Search failed' })
+			: fail(404, { error: 'Nothing found' });
+	}
+} satisfies Actions;
