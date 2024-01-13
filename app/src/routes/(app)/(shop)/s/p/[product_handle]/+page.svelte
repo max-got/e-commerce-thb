@@ -2,7 +2,6 @@
 	import { enhance } from '$app/forms';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import type { PageData } from './$types';
-	import Gallery from './Gallery.svelte';
 	import { toast } from 'svelte-sonner';
 
 	import { queryParam } from 'sveltekit-search-params';
@@ -16,6 +15,7 @@
 	import CertUvStandard from '$lib/assets/certificates/uv_standard_801.jpg?enhanced';
 	import CertRecycled from '$lib/assets/certificates/C000000_Recycled.png?enhanced';
 
+	import Gallery from './_components/Gallery.svelte';
 	import Accordion from './_components/Accordion.svelte';
 	import Details from './_components/utils/Details.svelte';
 	import Attributes from './_components/utils/Attributes.svelte';
