@@ -136,3 +136,15 @@
 		</div>
 	</section>
 {/if}
+
+{#if !data.cart && !form?.order}
+	<section class="px-4 py-2">
+		<div class="flex h-screen flex-col items-center justify-center gap-4 text-center">
+			<h2 class="text-lg">Dein Warenkorb ist leer</h2>
+			<p>
+				Leider ist dein Warenkorb leer. Bitte füge Produkte hinzu, um eine Bestellung aufzugeben.
+			</p>
+			<Button href="/" colorway="primary">Zurück zum Shop</Button>
+		</div>
+	</section>
+{/if}

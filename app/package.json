@@ -22,6 +22,7 @@
 		"@tailwindcss/aspect-ratio": "^0.4.2",
 		"@tailwindcss/forms": "^0.5.7",
 		"@tailwindcss/typography": "^0.5.10",
+		"@types/nodemailer": "^6.4.14",
 		"@typescript-eslint/eslint-plugin": "^6.13.2",
 		"@typescript-eslint/parser": "^6.13.2",
 		"autoprefixer": "^10.4.16",
@@ -54,8 +55,10 @@
 		"clsx": "^2.0.0",
 		"cookie": "^0.6.0",
 		"dotenv": "^16.3.1",
+		"handlebars": "^4.7.8",
 		"just-debounce-it": "^3.2.0",
 		"just-throttle": "^4.2.0",
+		"nodemailer": "^6.9.8",
 		"svelte-sonner": "^0.3.6",
 		"sveltekit-superfetch": "^3.0.3",
 		"tailwind-merge": "^2.1.0"

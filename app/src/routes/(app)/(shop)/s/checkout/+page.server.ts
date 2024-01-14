@@ -1,3 +1,4 @@
+import { send_order_placed_email } from '$lib/server/email/order_placed/send_email';
 import { medusa_client } from '$lib/server/medusa';
 import type { Order } from '@medusajs/medusa';
 import { fail } from '@sveltejs/kit';
@@ -55,7 +56,21 @@ export const actions: Actions = {
 			const perf_start = performance.now();
 			const order = await medusa_client.carts.complete(locals.cartid);
 			const perf_end = performance.now();
-			console.log('complete order time', `${perf_end - perf_start}ms`);
+			console.log('complete order time', `${(perf_end - perf_start).toFixed(2)}ms`);
+
+			if (order.type === 'order') {
+				await medusa_client.orders
+					.lookupOrder({
+						display_id: order.data.display_id,
+						email: order.data.email
+					})
+					.then(async (a) => {
+						await send_order_placed_email(a.order);
+					})
+					.catch((err) => {
+						console.log('Error sending order placed email', err);
+					});
+			}
 
 			cookies.set('cartid', '', {
 				path: '/',
