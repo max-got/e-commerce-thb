@@ -1,7 +1,8 @@
 import { EMAIL_USER } from '$env/static/private';
 import type { StoreOrdersRes } from '@medusajs/medusa';
-import fsPromise from 'fs/promises';
 import Handlebars from 'handlebars';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 import type { SendMailOptions } from 'nodemailer';
 import { transporter } from '../transporter';
 import { TEMPLATE } from './template';
@@ -13,12 +14,9 @@ export async function send_order_placed_email(order: StoreOrdersRes['order']) {
 
 	const email_template = Handlebars.compile(TEMPLATE);
 
-	const current_path = import.meta.url;
-	const __dirname = new URL('.', current_path).pathname;
-	//get all pdf files in assets folder
-	const pdf_files = await fsPromise.readdir(new URL('./assets', current_path)).then((files) => {
-		return files.filter((file) => file.endsWith('.pdf'));
-	});
+	const pathName = path.resolve('static/legal');
+	const files = await fs.readdir(pathName);
+	const pdf_files = files.filter((file) => file.endsWith('.pdf'));
 
 	const message: SendMailOptions = {
 		from: EMAIL_USER,
@@ -37,7 +35,7 @@ export async function send_order_placed_email(order: StoreOrdersRes['order']) {
 		attachments: [
 			...pdf_files.map((file) => ({
 				filename: file,
-				path: `${__dirname}/assets/${file}`,
+				path: `${pathName}/${file}`,
 				contentType: 'application/pdf'
 			}))
 		]
