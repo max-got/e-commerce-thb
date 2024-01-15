@@ -87,12 +87,6 @@
 				<div class="flex w-full flex-row flex-wrap lg:flex-nowrap lg:items-start lg:justify-end">
 					<div class="my-5 mr-8 flex flex-1 flex-col space-y-5 lg:ml-10">
 						<h2 class="text-accent-200 text-base uppercase">Support</h2>
-						<a href="/help/return-refund" class="font-body text-sm font-light text-white"
-							>Rückgabe</a
-						>
-						<a href="/help/payment-options" class="font-body text-sm font-light text-white"
-							>Zahlungsoptionen</a
-						>
 						<a href="/terms-and-conditions" class="font-body text-sm font-light text-white">AGBs</a>
 						<a href="/imprint" class="font-body text-sm font-light text-white">Impressum</a>
 						<a href="/privacy-policy" class="font-body text-sm font-light text-white"

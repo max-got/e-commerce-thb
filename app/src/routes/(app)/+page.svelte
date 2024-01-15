@@ -2,7 +2,6 @@
 	import { page } from '$app/stores';
 	import BentoGrid from '$lib/components/BentoGrid.svelte';
 	import Faq from '$lib/components/FAQ.svelte';
-	import { CtaOne } from '$lib/components/ctas';
 
 	import FeaturedProducts from '$lib/components/products/FeaturedProducts.svelte';
 	import { toast } from 'svelte-sonner';
@@ -28,7 +27,6 @@
 
 <Hero />
 <FeaturedProducts featured_products={data.shop.featured_products} />
-<CtaOne />
 <Faq id="faq" />
 
 <BentoGrid />
